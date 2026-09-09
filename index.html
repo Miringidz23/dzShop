@@ -42,7 +42,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 section{padding:40px 0}
 .stitle{font-size:24px;font-weight:800;text-align:center;margin-bottom:30px;position:relative;padding-bottom:12px}
 .stitle::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:55px;height:4px;background:var(--p);border-radius:2px}
-.cats{display:grid;grid-template-columns:repeat(6,1fr);gap:15px}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:15px}
 .cat{background:#fff;border-radius:var(--r);padding:22px 10px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.3s;cursor:pointer}
 .cat:hover{transform:translateY(-6px);box-shadow:0 10px 20px rgba(0,0,0,.1)}
 .cico{width:65px;height:65px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff}
@@ -57,10 +57,11 @@ section{padding:40px 0}
 .fbtn{padding:8px 18px;border:2px solid var(--gl);background:#fff;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;transition:.3s}
 .fbtn.on,.fbtn:hover{background:var(--p);color:#fff;border-color:var(--p)}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.card{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.3s;position:relative}
+.card{background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.3s;position:relative;color:var(--d)}
 .card:hover{transform:translateY(-5px);box-shadow:0 12px 24px rgba(0,0,0,.12)}
 .cimg{height:180px;background:var(--gl);display:flex;align-items:center;justify-content:center;position:relative}
 .cimg>i.pic{font-size:60px;color:var(--g);opacity:.35}
+.cimg img{width:100%;height:100%;object-fit:cover}
 .bdgs{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:4px}
 .bdg{padding:3px 9px;border-radius:4px;font-size:11px;font-weight:700;color:#fff}
 .bdg.sale{background:var(--dg)}.bdg.new{background:var(--sc)}.bdg.hot{background:var(--wr)}
@@ -125,8 +126,11 @@ section{padding:40px 0}
 .toast.on{opacity:1;transform:translateY(0)}
 .empty{text-align:center;padding:50px 15px;color:var(--g)}
 .empty i{font-size:55px;opacity:.3;margin-bottom:12px}
-@media(max-width:1024px){.cats{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(3,1fr)}.fgrid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.search{display:none}.hero{height:230px}.slide{padding:0 25px}.slide h1{font-size:24px}.cats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.feats{grid-template-columns:repeat(2,1fr)}.fgrid{grid-template-columns:1fr}.nform{flex-direction:column}}
+.dig-sec{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff}
+.dig-sec .stitle{color:#fff}
+.dig-trust{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-bottom:28px;font-size:13px;opacity:.9}
+@media(max-width:1024px){.grid{grid-template-columns:repeat(3,1fr)}.fgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.search{display:none}.hero{height:230px}.slide{padding:0 25px}.slide h1{font-size:24px}.grid{grid-template-columns:repeat(2,1fr)}.feats{grid-template-columns:repeat(2,1fr)}.fgrid{grid-template-columns:1fr}.nform{flex-direction:column}}
 @media(max-width:480px){.grid{grid-template-columns:1fr}.top-bar span:nth-child(3){display:none}}
 </style>
 </head>
@@ -135,7 +139,7 @@ section{padding:40px 0}
 <div class="top-bar"><div class="container">
 <span><i class="fas fa-phone"></i> 0550 123 456</span>
 <span><i class="fas fa-truck"></i> شحن مجاني فوق 200 ر.س</span>
-<span><i class="fas fa-undo"></i> إرجاع خلال 30 يوم</span>
+<span><i class="fas fa-bolt"></i> منتجات رقمية تسليم فوري</span>
 </div></div>
 
 <header class="header"><div class="container">
@@ -150,6 +154,7 @@ section{padding:40px 0}
 
 <nav class="nav"><div class="container"><ul>
 <li><a href="#" class="active">الرئيسية</a></li>
+<li><a href="#digital">رقمية 💻</a></li>
 <li><a href="#" onclick="filt('electronics');return false">إلكترونيات</a></li>
 <li><a href="#" onclick="filt('fashion');return false">أزياء</a></li>
 <li><a href="#" onclick="filt('home');return false">المنزل</a></li>
@@ -159,15 +164,16 @@ section{padding:40px 0}
 </ul></div></nav>
 
 <div class="hero" id="hero">
-<div class="slide on" style="background:linear-gradient(135deg,#667eea,#764ba2)"><div><span class="sbadge">عروض حصرية</span><h1>خصم يصل إلى 50%</h1><p>على جميع الإلكترونيات</p><a href="#prods" class="btn btn-p" style="background:#fff;color:#4f46e5">تسوق الآن</a></div></div>
-<div class="slide" style="background:linear-gradient(135deg,#f093fb,#f5576c)"><div><span class="sbadge">موسم الأزياء</span><h1>تشكيلة جديدة</h1><p>أحدث صيحات الموضة</p><a href="#prods" class="btn btn-p" style="background:#fff;color:#f5576c">اكتشف</a></div></div>
-<div class="slide" style="background:linear-gradient(135deg,#4facfe,#00f2fe)"><div><span class="sbadge">شحن مجاني</span><h1>وصل حديثاً</h1><p>منتجات جديدة كل يوم</p><a href="#prods" class="btn btn-p" style="background:#fff;color:#0a8">تصفح</a></div></div>
+<div class="slide on" style="background:linear-gradient(135deg,#667eea,#764ba2)"><div><span class="sbadge">عروض حصرية</span><h1>خصم يصل إلى 50%</h1><p>على جميع الإلكترونيات</p><a href="#prods" class="btn" style="background:#fff;color:#4f46e5">تسوق الآن</a></div></div>
+<div class="slide" style="background:linear-gradient(135deg,#0f172a,#0ea5e9)"><div><span class="sbadge">⚡ تسليم فوري</span><h1>منتجات رقمية</h1><p>دورات وكتب وقوالب — استلام فوري</p><a href="#digital" class="btn" style="background:#fff;color:#0ea5e9">اكتشف الآن</a></div></div>
+<div class="slide" style="background:linear-gradient(135deg,#f093fb,#f5576c)"><div><span class="sbadge">موسم الأزياء</span><h1>تشكيلة جديدة</h1><p>أحدث صيحات الموضة</p><a href="#prods" class="btn" style="background:#fff;color:#f5576c">اكتشف</a></div></div>
 <div class="sdots" id="dots"></div>
 </div>
 
 <section><div class="container">
 <h2 class="stitle">تسوق حسب القسم</h2>
 <div class="cats">
+<div class="cat" onclick="filt('digital')"><div class="cico" style="background:linear-gradient(135deg,#0f172a,#0ea5e9)"><i class="fas fa-cloud-download-alt"></i></div><h3>رقمية 💻</h3></div>
 <div class="cat" onclick="filt('electronics')"><div class="cico" style="background:linear-gradient(135deg,#667eea,#764ba2)"><i class="fas fa-laptop"></i></div><h3>إلكترونيات</h3></div>
 <div class="cat" onclick="filt('fashion')"><div class="cico" style="background:linear-gradient(135deg,#f093fb,#f5576c)"><i class="fas fa-tshirt"></i></div><h3>أزياء</h3></div>
 <div class="cat" onclick="filt('home')"><div class="cico" style="background:linear-gradient(135deg,#4facfe,#00f2fe)"><i class="fas fa-couch"></i></div><h3>المنزل</h3></div>
@@ -175,6 +181,17 @@ section{padding:40px 0}
 <div class="cat" onclick="filt('beauty')"><div class="cico" style="background:linear-gradient(135deg,#fa709a,#fee140)"><i class="fas fa-spa"></i></div><h3>جمال</h3></div>
 <div class="cat" onclick="filt('books')"><div class="cico" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"><i class="fas fa-book"></i></div><h3>كتب</h3></div>
 </div>
+</div></section>
+
+<section class="dig-sec" id="digital"><div class="container">
+<h2 class="stitle">💻 منتجات رقمية</h2>
+<p style="text-align:center;margin:-20px 0 14px;opacity:.75;font-size:14px">تسليم فوري على بريدك — بلا شحن ولا انتظار ⚡</p>
+<div class="dig-trust">
+<span><i class="fas fa-bolt"></i> استلام فوري</span>
+<span><i class="fas fa-infinity"></i> وصول مدى الحياة</span>
+<span><i class="fas fa-shield-alt"></i> ضمان 7 أيام</span>
+</div>
+<div class="grid" id="digGrid"></div>
 </div></section>
 
 <section class="flash" id="flash"><div class="container">
@@ -188,11 +205,13 @@ section{padding:40px 0}
 <h2 class="stitle">منتجات مميزة</h2>
 <div class="filters" id="filters">
 <button class="fbtn on" onclick="filt('all',this)">الكل</button>
+<button class="fbtn" onclick="filt('digital',this)">رقمية</button>
 <button class="fbtn" onclick="filt('electronics',this)">إلكترونيات</button>
 <button class="fbtn" onclick="filt('fashion',this)">أزياء</button>
 <button class="fbtn" onclick="filt('home',this)">المنزل</button>
 <button class="fbtn" onclick="filt('sports',this)">رياضة</button>
 <button class="fbtn" onclick="filt('beauty',this)">جمال</button>
+<button class="fbtn" onclick="filt('books',this)">كتب</button>
 </div>
 <div class="grid" id="grid"></div>
 </div></section>
@@ -203,8 +222,8 @@ section{padding:40px 0}
 </div></section>
 
 <section><div class="container"><div class="feats">
-<div class="feat"><i class="fas fa-truck"></i><h3>شحن مجاني</h3><p>فوق 200 ر.س</p></div>
-<div class="feat"><i class="fas fa-undo"></i><h3>إرجاع سهل</h3><p>خلال 30 يوم</p></div>
+<div class="feat"><i class="fas fa-bolt"></i><h3>تسليم فوري</h3><p>للمنتجات الرقمية</p></div>
+<div class="feat"><i class="fas fa-truck"></i><h3>شحن سريع</h3><p>لكل الولايات</p></div>
 <div class="feat"><i class="fas fa-lock"></i><h3>دفع آمن</h3><p>حماية كاملة</p></div>
 <div class="feat"><i class="fas fa-headset"></i><h3>دعم 24/7</h3><p>خدمة متميزة</p></div>
 </div></div></section>
@@ -218,10 +237,10 @@ section{padding:40px 0}
 
 <footer class="footer"><div class="container">
 <div class="fgrid">
-<div class="fcol"><h3><i class="fas fa-store"></i> سـوق</h3><p style="font-size:14px;line-height:1.8">متجرك الإلكتروني المفضل. أفضل المنتجات بأفضل الأسعار مع ضمان الجودة والتوصيل السريع.</p>
-<div class="soc"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div></div>
+<div class="fcol"><h3><i class="fas fa-store"></i> سـوق</h3><p style="font-size:14px;line-height:1.8">متجرك الإلكتروني المفضل. منتجات مادية ورقمية بأفضل الأسعار مع ضمان الجودة.</p>
+<div class="soc"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-whatsapp"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div></div>
 <div class="fcol"><h3>روابط</h3><ul><li><a href="#">من نحن</a></li><li><a href="#">اتصل بنا</a></li><li><a href="#">الخصوصية</a></li><li><a href="#">الشروط</a></li></ul></div>
-<div class="fcol"><h3>حسابي</h3><ul><li><a href="#">طلباتي</a></li><li><a href="#">المفضلة</a></li><li><a href="#">تتبع الشحنة</a></li><li><a href="#">المساعدة</a></li></ul></div>
+<div class="fcol"><h3>حسابي</h3><ul><li><a href="#">طلباتي</a></li><li><a href="#">تحميلاتي</a></li><li><a href="#">المفضلة</a></li><li><a href="#">المساعدة</a></li></ul></div>
 <div class="fcol"><h3>تواصل</h3><ul><li><i class="fas fa-map-marker-alt"></i> الجزائر</li><li><i class="fas fa-phone"></i> 0550 123 456</li><li><i class="fas fa-envelope"></i> info@souq.dz</li></ul></div>
 </div>
 <div class="fbot">&copy; 2024 متجر سوق — جميع الحقوق محفوظة</div>
@@ -250,6 +269,12 @@ section{padding:40px 0}
 
 <script>
 const P=[
+{id:21,n:"دورة تعلم البرمجة من الصفر",c:"digital",p:1200,o:2500,r:4.9,rv:840,b:"hot",i:"fas fa-code",d:"40 ساعة فيديو + مشاريع عملية + شهادة إتمام. وصول مدى الحياة.",best:1,fl:1},
+{id:22,n:"كتاب إلكتروني: التسويق الرقمي",c:"digital",p:250,o:400,r:4.7,rv:520,b:"sale",i:"fas fa-book-reader",d:"دليل شامل PDF بـ180 صفحة لإتقان التسويق الرقمي والإعلانات.",best:1,fl:0},
+{id:23,n:"باقة 500 قالب تصميم احترافي",c:"digital",p:450,o:900,r:4.8,rv:310,b:"hot",i:"fas fa-palette",d:"قوالب PSD و Canva جاهزة للسوشيال ميديا والإعلانات.",best:1,fl:1},
+{id:24,n:"اشتراك تصميم 12 شهر",c:"digital",p:1800,o:2400,r:4.6,rv:190,b:"new",i:"fas fa-crown",d:"وصول غير محدود لمكتبة القوالب والصور والخطوط لمدة سنة.",best:0,fl:0},
+{id:25,n:"مكتبة 10000 مؤثر صوتي",c:"digital",p:320,o:550,r:4.5,rv:270,b:"sale",i:"fas fa-music",d:"مؤثرات وموسيقى خالية من حقوق النشر لمونتاج الفيديوهات.",best:0,fl:1},
+{id:26,n:"دورة الجرافيك ديزاين",c:"digital",p:950,o:1600,r:4.8,rv:430,b:"hot",i:"fas fa-pen-nib",d:"Photoshop و Illustrator من المبتدئ للاحتراف + ملفات المشاريع.",best:1,fl:0},
 {id:1,n:"آيفون 15 برو ماكس 256GB",c:"electronics",p:4999,o:5499,r:4.8,rv:1250,b:"sale",i:"fas fa-mobile-alt",d:"معالج A17 Pro وكاميرا 48MP وشاشة Super Retina XDR",best:1,fl:1},
 {id:2,n:"سماعات AirPods Pro 2",c:"electronics",p:899,o:1099,r:4.7,rv:890,b:"hot",i:"fas fa-headphones",d:"إلغاء ضوضاء نشط وجودة صوت استثنائية",best:1,fl:1},
 {id:3,n:"لابتوب ماك بوك اير M3",c:"electronics",p:4499,o:4999,r:4.9,rv:560,b:"new",i:"fas fa-laptop",d:"شريحة M3 وشاشة Liquid Retina وبطارية طويلة",best:0,fl:0},
@@ -271,62 +296,68 @@ const P=[
 {id:19,n:"طقم عناية بالبشرة",c:"beauty",p:280,o:380,r:4.5,rv:340,b:"new",i:"fas fa-pump-soap",d:"5 منتجات للعناية اليومية بالبشرة",best:0,fl:0},
 {id:20,n:"رواية عربية مميزة",c:"books",p:65,o:90,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة",best:0,fl:0}
 ];
-const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب"};
+const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
 let disc=0, cf='all', sq='';
 
 function stars(r){let s='';for(let i=1;i<=5;i++)s+=i<=Math.floor(r)?'<i class="fas fa-star"></i>':(i-r<1?'<i class="fas fa-star-half-alt"></i>':'<i class="far fa-star"></i>');return s}
-function card(x){const off=x.o?Math.round((1-x.p/x.o)*100):0;const lk=wish.includes(x.id);
-return `<div class="card"><div class="cimg"><i class="${x.i} pic"></i>
-<div class="bdgs">${x.b==='sale'?'<span class="bdg sale">تخفيض</span>':''}${x.b==='new'?'<span class="bdg new">جديد</span>':''}${x.b==='hot'?'<span class="bdg hot">رائج</span>':''}${off?`<span class="bdg sale">-${off}%</span>`:''}</div>
+
+function card(x){const off=x.o?Math.round((1-x.p/x.o)*100):0;const lk=wish.includes(x.id);const dg=x.c==='digital';
+return `<div class="card"><div class="cimg" ${dg?'style="background:linear-gradient(135deg,#e0f2fe,#f1f5f9)"':''}>${x.img?`<img src="${x.img}" loading="lazy">`:`<i class="${x.i} pic" ${dg?'style="color:#0ea5e9;opacity:.5"':''}></i>`}
+<div class="bdgs">${x.b==='sale'?'<span class="bdg sale">تخفيض</span>':''}${x.b==='new'?'<span class="bdg new">جديد</span>':''}${x.b==='hot'?'<span class="bdg hot">رائج</span>':''}${off?`<span class="bdg sale">-${off}%</span>`:''}${dg?'<span class="bdg" style="background:#0ea5e9"><i class="fas fa-bolt"></i> فوري</span>':''}</div>
 <div class="acts"><button class="abtn ${lk?'liked':''}" onclick="tw(${x.id})"><i class="fas fa-heart"></i></button><button class="abtn" onclick="qv(${x.id})"><i class="fas fa-eye"></i></button></div></div>
 <div class="cinfo"><span class="ccat">${CN[x.c]}</span><h3 class="cname">${x.n}</h3>
 <div class="rate"><span class="st">${stars(x.r)}</span><small>(${x.rv})</small></div>
 <div class="price"><span class="now">${x.p} ر.س</span>${x.o?`<span class="old">${x.o} ر.س</span>`:''}</div>
-<button class="atc" onclick="add(${x.id})"><i class="fas fa-cart-plus"></i> أضف للسلة</button></div></div>`}
+<button class="atc" ${dg?'style="background:#0ea5e9"':''} onclick="add(${x.id})"><i class="fas fa-${dg?'download':'cart-plus'}"></i> ${dg?'احصل عليه':'أضف للسلة'}</button></div></div>`}
+
+function paint(){
+document.getElementById('digGrid').innerHTML=P.filter(x=>x.c==='digital').map(card).join('');
+document.getElementById('flashGrid').innerHTML=P.filter(x=>x.fl).map(card).join('');
+document.getElementById('bestGrid').innerHTML=P.filter(x=>x.best).map(card).join('');
+render()}
 
 function render(){
 let L=P.filter(x=>(cf==='all'||x.c===cf)&&(!sq||x.n.includes(sq)||x.d.includes(sq)));
-document.getElementById('grid').innerHTML=L.length?L.map(card).join(''):'<div class="empty" style="grid-column:1/-1"><i class="fas fa-search"></i><h3>لا توجد نتائج</h3></div>';
-}
-document.getElementById('flashGrid').innerHTML=P.filter(x=>x.fl).map(card).join('');
-document.getElementById('bestGrid').innerHTML=P.filter(x=>x.best).map(card).join('');
-render();
+document.getElementById('grid').innerHTML=L.length?L.map(card).join(''):'<div class="empty" style="grid-column:1/-1"><i class="fas fa-search"></i><h3>لا توجد نتائج</h3></div>'}
 
 function filt(c,el){cf=c;sq='';document.getElementById('sInput').value='';
 document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
-if(el)el.classList.add('on');else{const b=[...document.querySelectorAll('.fbtn')].find(b=>b.textContent.trim()===CN[c]);if(b)b.classList.add('on')}
+if(el)el.classList.add('on');else{const b=[...document.querySelectorAll('.fbtn')].find(b=>b.textContent.trim()===(c==='all'?'الكل':CN[c]));if(b)b.classList.add('on')}
 render();document.getElementById('prods').scrollIntoView({behavior:'smooth'})}
 function doSearch(){sq=document.getElementById('sInput').value.trim();cf='all';render();document.getElementById('prods').scrollIntoView({behavior:'smooth'})}
 document.getElementById('sInput').addEventListener('keypress',e=>{if(e.key==='Enter')doSearch()});
 
 function add(id,q=1){const x=P.find(p=>p.id===id);const e=cart.find(c=>c.id===id);
-if(e)e.q+=q;else cart.push({id:x.id,n:x.n,p:x.p,i:x.i,c:x.c,q:q});
-save();showToast('تمت الإضافة للسلة 🛒')}
+if(x.c==='digital'){if(e){showToast('موجود في السلة ✓');return}cart.push({id:x.id,n:x.n,p:x.p,i:x.i,c:x.c,q:1})}
+else{if(e)e.q+=q;else cart.push({id:x.id,n:x.n,p:x.p,i:x.i,c:x.c,q:q})}
+save();showToast(x.c==='digital'?'أضيف — تسليم فوري ⚡':'تمت الإضافة للسلة 🛒')}
 function del(id){cart=cart.filter(c=>c.id!==id);save();drawCart()}
-function qty(id,d){const e=cart.find(c=>c.id===id);e.q+=d;if(e.q<1)return del(id);save();drawCart()}
+function qty(id,d){const e=cart.find(c=>c.id===id);if(e.c==='digital')return;e.q+=d;if(e.q<1)return del(id);save();drawCart()}
 function save(){localStorage.setItem('cart',JSON.stringify(cart));document.getElementById('cCount').textContent=cart.reduce((s,c)=>s+c.q,0)}
 function tw(id){const i=wish.indexOf(id);i>-1?(wish.splice(i,1),showToast('أزيل من المفضلة')):(wish.push(id),showToast('أضيف للمفضلة ❤️'));
-localStorage.setItem('wish',JSON.stringify(wish));document.getElementById('wCount').textContent=wish.length;render();
-document.getElementById('flashGrid').innerHTML=P.filter(x=>x.fl).map(card).join('');
-document.getElementById('bestGrid').innerHTML=P.filter(x=>x.best).map(card).join('')}
+localStorage.setItem('wish',JSON.stringify(wish));document.getElementById('wCount').textContent=wish.length;paint()}
 
 function drawCart(){const b=document.getElementById('cartBody'),f=document.getElementById('cartFoot');
 if(!cart.length){b.innerHTML='<div class="empty"><i class="fas fa-shopping-cart"></i><h3>السلة فارغة</h3><p>ابدأ التسوق الآن!</p></div>';f.innerHTML='';return}
-b.innerHTML=cart.map(c=>`<div class="citem"><div class="ci"><i class="${c.i}"></i></div>
+b.innerHTML=cart.map(c=>`<div class="citem"><div class="ci" ${c.c==='digital'?'style="background:#e0f2fe;color:#0ea5e9"':''}><i class="${c.i}"></i></div>
 <div style="flex:1"><h4>${c.n}</h4><span style="color:#4f46e5;font-weight:700">${c.p*c.q} ر.س</span>
-<div class="qty"><button onclick="qty(${c.id},-1)">-</button><span>${c.q}</span><button onclick="qty(${c.id},1)">+</button></div></div>
+${c.c==='digital'?'<div style="font-size:11px;color:#0ea5e9;margin-top:5px"><i class="fas fa-bolt"></i> تسليم فوري</div>':`<div class="qty"><button onclick="qty(${c.id},-1)">-</button><span>${c.q}</span><button onclick="qty(${c.id},1)">+</button></div>`}</div>
 <button class="del" onclick="del(${c.id})"><i class="fas fa-trash-alt"></i></button></div>`).join('');
-const sub=cart.reduce((s,c)=>s+c.p*c.q,0),shp=sub>200?0:25,tax=sub*.19,tot=sub+shp+tax-disc;
+const sub=cart.reduce((s,c)=>s+c.p*c.q,0);
+const allDig=cart.every(c=>c.c==='digital');
+const shp=allDig?0:(sub>200?0:25);
+const tax=sub*.19,tot=sub+shp+tax-disc;
 f.innerHTML=`<div class="coup"><input id="cIn" placeholder="كود الخصم"><button class="btn btn-o" onclick="coup()">تطبيق</button></div>
 <div class="srow"><span>المجموع</span><span>${sub.toFixed(2)} ر.س</span></div>
-<div class="srow"><span>الشحن</span><span>${shp?shp+' ر.س':'مجاني'}</span></div>
+<div class="srow"><span>الشحن</span><span>${allDig?'<b style="color:#0ea5e9">رقمي ⚡ مجاني</b>':(shp?shp+' ر.س':'مجاني')}</span></div>
 <div class="srow"><span>الضريبة 19%</span><span>${tax.toFixed(2)} ر.س</span></div>
 ${disc?`<div class="srow" style="color:#10b981"><span>الخصم</span><span>-${disc.toFixed(2)} ر.س</span></div>`:''}
 <div class="srow tot"><span>الإجمالي</span><span>${tot.toFixed(2)} ر.س</span></div>
 <button class="btn btn-p" style="width:100%;margin-top:10px" onclick="checkout()"><i class="fas fa-lock"></i> إتمام الشراء</button>`}
-function coup(){const c=document.getElementById('cIn').value.trim().toUpperCase();const m={SAVE10:10,SAVE20:20,SAVE50:50,WELCOME:15};
+
+function coup(){const c=document.getElementById('cIn').value.trim().toUpperCase();const m={SAVE10:10,SAVE20:20,SAVE50:50,WELCOME:15,DIGITAL30:30};
 if(m[c]){disc=cart.reduce((s,x)=>s+x.p*x.q,0)*m[c]/100;showToast(`خصم ${m[c]}% مُطبّق 🎉`);drawCart()}else showToast('كوبون غير صالح ❌')}
 function openCart(){drawCart();document.getElementById('cartD').classList.add('on');document.getElementById('ov').classList.add('on')}
 function openWish(){const b=document.getElementById('wishBody');const L=P.filter(x=>wish.includes(x.id));
@@ -337,35 +368,46 @@ b.innerHTML=L.length?L.map(x=>`<div class="citem"><div class="ci"><i class="${x.
 document.getElementById('wishD').classList.add('on');document.getElementById('ov').classList.add('on')}
 function closeAll(){document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('on'));document.getElementById('ov').classList.remove('on')}
 
-function qv(id){const x=P.find(p=>p.id===id);
+function qv(id){const x=P.find(p=>p.id===id);const dg=x.c==='digital';
 document.getElementById('qvBody').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="qvg">
-<div style="height:230px;background:#f3f4f6;border-radius:10px;display:flex;align-items:center;justify-content:center"><i class="${x.i}" style="font-size:80px;color:#9ca3af"></i></div>
+<div style="height:230px;background:${dg?'linear-gradient(135deg,#e0f2fe,#f1f5f9)':'#f3f4f6'};border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden">${x.img?`<img src="${x.img}" style="width:100%;height:100%;object-fit:cover">`:`<i class="${x.i}" style="font-size:80px;color:${dg?'#0ea5e9':'#9ca3af'}"></i>`}</div>
 <div><span class="ccat">${CN[x.c]}</span><h2 style="margin:8px 0">${x.n}</h2>
 <div class="rate"><span class="st">${stars(x.r)}</span><small>${x.r} (${x.rv} تقييم)</small></div>
 <div class="price"><span class="now">${x.p} ر.س</span>${x.o?`<span class="old">${x.o} ر.س</span>`:''}</div>
-<p style="color:#6b7280;font-size:14px;line-height:1.8;margin-bottom:15px">${x.d}</p>
-<div class="qty" style="margin-bottom:15px"><button onclick="mq(-1)">-</button><span id="mQ">1</span><button onclick="mq(1)">+</button></div>
-<button class="btn btn-p" onclick="add(${x.id},+document.getElementById('mQ').textContent);document.getElementById('qv').classList.remove('on')"><i class="fas fa-cart-plus"></i> أضف للسلة</button></div></div>`;
+<p style="color:#6b7280;font-size:14px;line-height:1.8;margin-bottom:12px">${x.d}</p>
+${dg?`<div style="background:#e0f2fe;padding:10px;border-radius:8px;font-size:13px;color:#0369a1;margin-bottom:14px">
+<div><i class="fas fa-bolt"></i> تسليم فوري على بريدك</div>
+<div style="margin-top:5px"><i class="fas fa-infinity"></i> وصول مدى الحياة</div>
+<div style="margin-top:5px"><i class="fas fa-shield-alt"></i> ضمان استرجاع 7 أيام</div></div>`
+:`<div class="qty" style="margin-bottom:15px"><button onclick="mq(-1)">-</button><span id="mQ">1</span><button onclick="mq(1)">+</button></div>`}
+<button class="btn btn-p" ${dg?'style="background:#0ea5e9"':''} onclick="add(${x.id},${dg?1:'+document.getElementById(\'mQ\').textContent'});document.getElementById('qv').classList.remove('on')"><i class="fas fa-${dg?'download':'cart-plus'}"></i> ${dg?'احصل عليه الآن':'أضف للسلة'}</button></div></div>`;
 document.getElementById('qv').classList.add('on')}
 function mq(d){const e=document.getElementById('mQ');e.textContent=Math.max(1,+e.textContent+d)}
 
 function checkout(){closeAll();
-document.getElementById('coBody').innerHTML=`<h2 style="margin-bottom:18px"><i class="fas fa-credit-card"></i> إتمام الطلب</h2>
+const allDig=cart.length&&cart.every(c=>c.c==='digital');
+if(!cart.length){showToast('السلة فارغة');return}
+document.getElementById('coBody').innerHTML=`<h2 style="margin-bottom:8px"><i class="fas fa-${allDig?'bolt':'credit-card'}"></i> ${allDig?'استلام فوري':'إتمام الطلب'}</h2>
+${allDig?'<p style="color:#0ea5e9;font-size:13px;margin-bottom:15px">📩 سيصلك رابط التحميل على بريدك خلال دقائق</p>':'<div style="height:10px"></div>'}
 <form onsubmit="return done(event)">
 <input required placeholder="الاسم الكامل" style="width:100%;padding:11px;margin-bottom:10px;border:2px solid #f3f4f6;border-radius:8px">
+<input required type="email" placeholder="البريد الإلكتروني" style="width:100%;padding:11px;margin-bottom:10px;border:2px solid #f3f4f6;border-radius:8px">
 <input required type="tel" placeholder="رقم الهاتف" style="width:100%;padding:11px;margin-bottom:10px;border:2px solid #f3f4f6;border-radius:8px">
-<input required placeholder="الولاية / المدينة" style="width:100%;padding:11px;margin-bottom:10px;border:2px solid #f3f4f6;border-radius:8px">
+${allDig?'':`<input required placeholder="الولاية / المدينة" style="width:100%;padding:11px;margin-bottom:10px;border:2px solid #f3f4f6;border-radius:8px">
 <textarea required rows="2" placeholder="العنوان التفصيلي" style="width:100%;padding:11px;margin-bottom:10px;border:2px solid #f3f4f6;border-radius:8px"></textarea>
-<label style="display:block;margin-bottom:8px"><input type="radio" name="pm" checked> 💵 الدفع عند الاستلام</label>
-<label style="display:block;margin-bottom:15px"><input type="radio" name="pm"> 💳 بطاقة بنكية</label>
-<button class="btn btn-p" style="width:100%">تأكيد الطلب</button></form>`;
+<label style="display:block;margin-bottom:8px"><input type="radio" name="pm" checked> 💵 الدفع عند الاستلام</label>`}
+<label style="display:block;margin-bottom:15px"><input type="radio" name="pm" ${allDig?'checked':''}> 💳 بطاقة بنكية / تحويل</label>
+<button class="btn btn-p" style="width:100%;${allDig?'background:#0ea5e9':''}">${allDig?'ادفع واستلم فوراً ⚡':'تأكيد الطلب'}</button></form>`;
 document.getElementById('co').classList.add('on')}
+
 function done(e){e.preventDefault();
+const allDig=cart.every(c=>c.c==='digital');
 const num='ORD-'+Math.random().toString(36).substr(2,7).toUpperCase();
 document.getElementById('coBody').innerHTML=`<div style="text-align:center;padding:25px">
 <i class="fas fa-check-circle" style="font-size:65px;color:#10b981"></i>
 <h2 style="color:#10b981;margin:15px 0">تم تأكيد طلبك! 🎉</h2>
-<p>رقم الطلب: <b>${num}</b></p><p style="color:#6b7280;margin:10px 0">سنتصل بك قريباً لتأكيد التوصيل</p>
+<p>رقم الطلب: <b>${num}</b></p>
+<p style="color:#6b7280;margin:10px 0">${allDig?'📩 تحقق من بريدك — روابط التحميل في الطريق ⚡':'سنتصل بك قريباً لتأكيد التوصيل'}</p>
 <button class="btn btn-p" onclick="document.getElementById('co').classList.remove('on')">حسناً</button></div>`;
 cart=[];disc=0;save();return false}
 
@@ -383,8 +425,8 @@ mm.textContent=String(Math.floor(d%36e5/6e4)).padStart(2,'0');
 ss.textContent=String(Math.floor(d%6e4/1e3)).padStart(2,'0')},1000);
 
 onscroll=()=>document.getElementById('up').classList.toggle('on',scrollY>300);
-save();document.getElementById('wCount').textContent=wish.length;
+paint();save();document.getElementById('wCount').textContent=wish.length;
 if(innerWidth<600){const s=document.createElement('style');s.textContent='.qvg{grid-template-columns:1fr!important}';document.head.appendChild(s)}
 </script>
 </body>
-    </html>
+                                                              </html>
