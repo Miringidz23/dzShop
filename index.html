@@ -273,10 +273,14 @@ section{padding:40px 0}
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="tMsg"></span></div>
 
 <script>
-/* ====== ⚙️ الإعدادات — بدّل رقمك هنا ====== */
-const WA="213655102232";   // رقم واتساب (بلا + وبلا صفر في البداية)
-const CUR="دج";            // العملة
-/* ========================================= */
+/* ====== ⚙️ الإعدادات ====== */
+const WA = "213550123456"; 
+const CUR = "دج";
+const CRM_URL = "https://crm-app-6t6b.onrender.com/api/store-order";
+
+// إيقاظ سيرفر الـ CRM تلقائياً في الخلفية عند دخول المتجر
+if(CRM_URL) fetch(CRM_URL.replace('/api/store-order',''),{mode:'no-cors'}).catch(()=>{});
+/* ======================== */
 
 const W=[["أدرار",1000,600],["الشلف",700,400],["الأغواط",800,500],["أم البواقي",700,400],["باتنة",700,400],["بجاية",700,400],["بسكرة",750,450],["بشار",1000,600],["البليدة",600,350],["البويرة",700,400],["تمنراست",1200,800],["تبسة",800,450],["تلمسان",750,450],["تيارت",750,450],["تيزي وزو",700,400],["الجزائر",500,300],["الجلفة",800,450],["جيجل",700,400],["سطيف",700,400],["سعيدة",750,450],["سكيكدة",700,400],["سيدي بلعباس",750,450],["عنابة",700,400],["قالمة",700,400],["قسنطينة",700,400],["المدية",700,400],["مستغانم",700,400],["المسيلة",750,450],["معسكر",750,450],["ورقلة",900,550],["وهران",700,400],["البيض",900,550],["إليزي",1400,900],["برج بوعريريج",700,400],["بومرداس",600,350],["الطارف",750,450],["تندوف",1400,900],["تيسمسيلت",750,450],["الوادي",900,550],["خنشلة",800,450],["سوق أهراس",750,450],["تيبازة",600,350],["ميلة",700,400],["عين الدفلى",700,400],["النعامة",900,550],["عين تموشنت",750,450],["غرداية",900,550],["غليزان",700,400],["تيميمون",1100,700],["برج باجي مختار",1400,900],["أولاد جلال",850,500],["بني عباس",1100,700],["عين صالح",1300,850],["عين قزام",1400,900],["تقرت",900,550],["جانت",1400,900],["المغير",900,550],["المنيعة",1000,600]];
 
@@ -426,6 +430,19 @@ m+=`%0A💰 *المجموع: ${(sub-disc).toLocaleString('en-US')} ${CUR}*`;
 if(disc)m+=`%0A🎟️ الخصم: -${disc.toLocaleString('en-US')} ${CUR}`;
 open(`https://wa.me/${WA}?text=${m}`,'_blank')}
 
+/* ===== إرسال للـ CRM ===== */
+function sendToCRM(order){
+  if(!CRM_URL) return Promise.resolve();
+  return fetch(CRM_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(order)
+  }).then(r=>r.json()).catch(()=>{
+    const q=JSON.parse(localStorage.getItem('pending')||'[]');
+    q.push(order);localStorage.setItem('pending',JSON.stringify(q));
+  });
+}
+
 /* ===== إتمام الطلب ===== */
 function checkout(){if(!cart.length)return showToast('السلة فارغة');closeAll();
 const allDig=cart.every(c=>c.c==='digital');
@@ -444,6 +461,7 @@ ${allDig?'':`<select class="inp" required id="fW" onchange="calcD()"><option val
 <button type="button" class="btn btn-w" style="width:100%;margin-top:8px" onclick="waFull()"><i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب</button>
 </form>`;
 calcD();document.getElementById('co').classList.add('on')}
+
 function calcD(){const allDig=cart.every(c=>c.c==='digital');const sub=cart.reduce((s,c)=>s+c.p*c.q,0);
 let ship=0;
 if(!allDig){const w=document.getElementById('fW');
@@ -455,6 +473,7 @@ sumBox.innerHTML=`<div class="srow"><span>المنتجات</span><span>${fmt(sub
 ${disc?`<div class="srow" style="color:#10b981"><span>الخصم</span><span>-${fmt(disc)}</span></div>`:''}
 <div class="srow tot" style="font-size:17px"><span>الإجمالي</span><span>${fmt(tot)}</span></div>`;
 return{sub,ship,tot}}
+
 function waFull(){const allDig=cart.every(c=>c.c==='digital');
 const n=document.getElementById('fN').value||'—',p=document.getElementById('fP').value||'—';
 const {sub,ship,tot}=calcD();
@@ -468,8 +487,32 @@ m+=`%0A💵 المنتجات: ${sub.toLocaleString('en-US')} ${CUR}%0A🚚 ال�
 if(disc)m+=`🎟️ الخصم: -${disc.toLocaleString('en-US')} ${CUR}%0A`;
 m+=`*💰 الإجمالي: ${tot.toLocaleString('en-US')} ${CUR}*`;
 open(`https://wa.me/${WA}?text=${m}`,'_blank')}
+
 function done(e){e.preventDefault();const allDig=cart.every(c=>c.c==='digital');
-const {tot}=calcD();const num='DZ-'+Math.random().toString(36).substr(2,6).toUpperCase();
+const {sub,ship,tot}=calcD();
+const num='DZ-'+Math.random().toString(36).substr(2,6).toUpperCase();
+const wEl=document.getElementById('fW');
+
+const order={
+  orderId:num,
+  date:new Date().toISOString(),
+  name:document.getElementById('fN').value,
+  phone:document.getElementById('fP').value,
+  email:(document.getElementById('fE')||{}).value||'',
+  wilaya:(!allDig&&wEl&&wEl.value!=='')?((+wEl.value+1)+' - '+W[+wEl.value][0]):'رقمي',
+  address:allDig?'منتج رقمي (تسليم فوري)':((document.getElementById('fA')||{}).value||''),
+  delivery:allDig?'رقمي':(document.querySelector('input[name=dt]:checked').value==='home'?'للمنزل':'مكتب التوصيل'),
+  products:cart.map(c=>c.n+' ×'+c.q).join(' | '),
+  qty:cart.reduce((s,c)=>s+c.q,0),
+  subtotal:sub,shipping:ship,discount:disc,total:tot,
+  payment:allDig?'مسبق':'الدفع عند الاستلام',
+  type:allDig?'digital':'physical'
+};
+
+const btn=e.target.querySelector('.btn-p');
+if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'}
+
+sendToCRM(order).finally(()=>{
 coBody.innerHTML=`<div style="text-align:center;padding:22px">
 <i class="fas fa-check-circle" style="font-size:64px;color:#10b981"></i>
 <h2 style="color:#10b981;margin:14px 0">تم تأكيد طلبك! 🎉</h2>
@@ -477,7 +520,9 @@ coBody.innerHTML=`<div style="text-align:center;padding:22px">
 <p style="font-size:20px;font-weight:800;color:var(--p);margin:10px 0">${fmt(tot)}</p>
 <p style="color:var(--g);margin-bottom:16px">${allDig?'📩 تحقق من بريدك — روابط التحميل في الطريق ⚡':'📞 سنتصل بك خلال 24 ساعة لتأكيد التوصيل'}</p>
 <button class="btn btn-p" onclick="cls('co')">حسناً</button></div>`;
-cart=[];disc=0;save();return false}
+cart=[];disc=0;save();
+});
+return false}
 
 function showToast(m){const t=toast;tMsg.textContent=m;t.classList.add('on');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('on'),2500)}
 
@@ -497,6 +542,10 @@ hh.textContent=String(Math.floor(d/36e5)).padStart(2,'0');mm.textContent=String(
 onscroll=()=>up.classList.toggle('on',scrollY>300);
 paint();save();wCount.textContent=wish.length;
 if(innerWidth<680){const s=document.createElement('style');s.textContent='.pdg{grid-template-columns:1fr!important}';document.head.appendChild(s)}
+
+// إعادة إرسال الطلبات المعلقة محلياً إن وجدت
+(function(){const q=JSON.parse(localStorage.getItem('pending')||'[]');
+if(q.length&&CRM_URL){localStorage.removeItem('pending');q.forEach(o=>sendToCRM(o))}})();
 </script>
 </body>
   </html>
