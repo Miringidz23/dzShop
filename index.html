@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر سوق - تسوق أونلاين</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- الشريط العلوي -->
+    <div class="top-bar">
+        <div class="container">
+            <span><i class="fas fa-phone"></i> +966 50 123 4567</span>
+            <span><i class="fas fa-truck"></i> شحن مجاني للطلبات فوق 200 ريال</span>
+            <span><i class="fas fa-undo"></i> إرجاع مجاني خلال 30 يوم</span>
+        </div>
+    </div>
+
+    <!-- الهيدر -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-store"></i> سـوق
+            </a>
+
+            <div class="search-bar">
+                <select id="categoryFilter">
+                    <option value="all">كل الأقسام</option>
+                    <option value="electronics">إلكترونيات</option>
+                    <option value="fashion">أزياء</option>
+                    <option value="home">المنزل</option>
+                    <option value="sports">رياضة</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="ابحث عن منتجات...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="header-actions">
+                <a href="pages/login.html" class="header-btn" id="accountBtn">
+                    <i class="fas fa-user"></i>
+                    <span>حسابي</span>
+                </a>
+                <a href="#" class="header-btn" id="wishlistBtn">
+                    <i class="fas fa-heart"></i>
+                    <span class="badge" id="wishlistCount">0</span>
+                    <span>المفضلة</span>
+                </a>
+                <a href="pages/cart.html" class="header-btn" id="cartBtn">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="badge" id="cartCount">0</span>
+                    <span>السلة</span>
+                </a>
+            </div>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- القائمة الرئيسية -->
+    <nav class="main-nav" id="mainNav">
+        <div class="container">
+            <ul>
+                <li><a href="index.html" class="active">الرئيسية</a></li>
+                <li class="has-dropdown">
+                    <a href="#">الأقسام <i class="fas fa-chevron-down"></i></a>
+                    <ul class="dropdown">
+                        <li><a href="#" data-category="electronics"><i class="fas fa-laptop"></i> إلكترونيات</a></li>
+                        <li><a href="#" data-category="fashion"><i class="fas fa-tshirt"></i> أزياء</a></li>
+                        <li><a href="#" data-category="home"><i class="fas fa-home"></i> المنزل والمطبخ</a></li>
+                        <li><a href="#" data-category="sports"><i class="fas fa-football-ball"></i> رياضة</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">العروض 🔥</a></li>
+                <li><a href="#">جديدنا</a></li>
+                <li><a href="#">الأكثر مبيعاً</a></li>
+                <li><a href="#">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- أقسام الموقع الرئيسية -->
+    <section class="categories-section">
+        <div class="container">
+            <h2 class="section-title">تسوق حسب القسم</h2>
+            <div class="categories-grid">
+                <a href="#" class="category-card" data-category="electronics">
+                    <div class="category-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3>إلكترونيات</h3>
+                </a>
+                <a href="#" class="category-card" data-category="fashion">
+                    <div class="category-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <h3>أزياء</h3>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- المنتجات المميزة -->
+    <section class="featured-products">
+        <div class="container">
+            <h2 class="section-title">منتجات مميزة</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- يتم ملؤها بـ JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <script src="js/app.js"></script>
+</body>
+                      </html>
