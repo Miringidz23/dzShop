@@ -512,22 +512,29 @@ const {sub,ship,tot}=calcD();
 const num='DZ-'+Math.random().toString(36).substr(2,6).toUpperCase();
 const wEl=document.getElementById('fW');
 
-const order={
-  orderId:num,
-  date:new Date().toISOString(),
-  name:document.getElementById('fN').value,
-  phone:document.getElementById('fP').value,
-  email:(document.getElementById('fE')||{}).value||'',
-  wilaya:(!allDig&&wEl&&wEl.value!=='')?((+wEl.value+1)+' - '+W[+wEl.value][0]):'رقمي',
-  address:allDig?'منتج رقمي (تسليم فوري)':((document.getElementById('fA')||{}).value||''),
-  delivery:allDig?'رقمي':(document.querySelector('input[name=dt]:checked').value==='home'?'للمنزل':'مكتب التوصيل'),
-  products:cart.map(c=>c.n+' ×'+c.q).join(' | '),
-  qty:cart.reduce((s,c)=>s+c.q,0),
-  subtotal:sub,shipping:ship,discount:disc,total:tot,
-  payment:allDig?'مسبق':'الدفع عند الاستلام',
-  type:allDig?'digital':'physical'
-};
-
+    const pName = cart.map(c => (c.n || c.t || c.title || c.name || 'منتج') + ' (x' + (c.q || 1) + ')').join(' + ');
+    const order={
+      orderId:num,
+      date:new Date().toISOString(),
+      name:document.getElementById('fN').value,
+      phone:document.getElementById('fP').value,
+      email:(document.getElementById('fE')||{}).value||'',
+      wilaya:(!allDig&&wEl&&wEl.value!='')?((+wEl.value+1)+' - '+W[+wEl.value][0]):'',
+      address:allDig?'منتج رقمي (تسليم فوري)':((document.getElementById('fA')||{}).value||''),
+      delivery:allDig?'رقمي':(document.querySelector('input[name=dt]:checked').value==='home'?'للمنزل':'مكتب التوصيل'),
+      product: pName,
+      product_name: pName,
+      productName: pName,
+      products: pName,
+      items: cart.map(c => ({ name: c.n || c.t || c.title || c.name, price: c.p, quantity: c.q })),
+      qty:cart.reduce((s,c)=>s+c.q,0),
+      quantity:cart.reduce((s,c)=>s+c.q,0),
+      subtotal:sub,shipping:ship,discount:disc,total:tot,
+      price: tot,
+      amount: tot,
+      payment:allDig?'مسبق':'الدفع عند الاستلام',
+      type:allDig?'digital':'physical'
+    };
 const btn=e.target.querySelector('.btn-p');
 if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'}
 
