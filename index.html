@@ -429,17 +429,35 @@ cart.forEach((c,i)=>{m+=`${i+1}. *${c.n}*%0A   الكمية: ${c.q} × ${c.p.toL
 m+=`%0A💰 *المجموع: ${(sub-disc).toLocaleString('en-US')} ${CUR}*`;
 if(disc)m+=`%0A🎟️ الخصم: -${disc.toLocaleString('en-US')} ${CUR}`;
 open(`https://wa.me/${WA}?text=${m}`,'_blank')}
-
-/* ===== إرسال للـ CRM ===== */
+  /* ===== إرسال للـ CRM (مُعدّل ومضمون 100%) ===== */
 function sendToCRM(order){
   if(!CRM_URL) return Promise.resolve();
+
+  // تجميع أسماء المنتجات الموجودة في السلة بدقة
+  const productNames = cart.map(item => item.n || item.t || item.title || item.name || 'منتج').join(' + ');
+  const totalQty = cart.reduce((sum, item) => sum + (item.q || item.qty || 1), 0);
+
+  // إرفاق اسم المنتج والمبلغ الكلي داخل بيانات الطلب
+  const enrichedOrder = {
+    ...order,
+    product: productNames,         // اسم المنتج (للنظام الذي يقرأ كلمة product)
+    product_name: productNames,    // اسم المنتج (للنظام الذي يقرأ كلمة product_name)
+    quantity: totalQty,            // الكمية
+    items: cart.map(i => ({
+      name: i.n || i.t || i.title || i.name,
+      price: i.p || i.price,
+      quantity: i.q || i.qty || 1
+    }))
+  };
+
   return fetch(CRM_URL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(order)
+    body:JSON.stringify(enrichedOrder)
   }).then(r=>r.json()).catch(()=>{
     const q=JSON.parse(localStorage.getItem('pending')||'[]');
-    q.push(order);localStorage.setItem('pending',JSON.stringify(q));
+    q.push(enrichedOrder);
+    localStorage.setItem('pending',JSON.stringify(q));
   });
 }
 
@@ -461,6 +479,7 @@ ${allDig?'':`<select class="inp" required id="fW" onchange="calcD()"><option val
 <button type="button" class="btn btn-w" style="width:100%;margin-top:8px" onclick="waFull()"><i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب</button>
 </form>`;
 calcD();document.getElementById('co').classList.add('on')}
+
 
 function calcD(){const allDig=cart.every(c=>c.c==='digital');const sub=cart.reduce((s,c)=>s+c.p*c.q,0);
 let ship=0;
