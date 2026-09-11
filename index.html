@@ -461,24 +461,48 @@ function sendToCRM(order){
   });
 }
 
-/* ===== إتمام الطلب ===== */
-function checkout(){if(!cart.length)return showToast('السلة فارغة');closeAll();
-const allDig=cart.every(c=>c.c==='digital');
-coBody.innerHTML=`<h2 style="margin-bottom:12px"><i class="fas fa-${allDig?'bolt':'clipboard-check'}"></i> ${allDig?'استلام فوري':'معلومات التوصيل'}</h2>
-${allDig?'<p style="color:#0ea5e9;font-size:13px;margin-bottom:12px">📩 سيصلك رابط التحميل على بريدك خلال دقائق</p>':''}
-<form onsubmit="return done(event)">
-<input class="inp" required id="fN" placeholder="الاسم الكامل *">
-<input class="inp" required id="fP" type="tel" placeholder="رقم الهاتف *" pattern="0[567][0-9]{8}">
-<input class="inp" ${allDig?'required':''} id="fE" type="email" placeholder="البريد الإلكتروني ${allDig?'*':'(اختياري)'}">
-${allDig?'':`<select class="inp" required id="fW" onchange="calcD()"><option value="">اختر الولاية *</option>${W.map((w,i)=>`<option value="${i}">${String(i+1).padStart(2,'0')} - ${w[0]}</option>`).join('')}</select>
-<div class="dlv"><label><input type="radio" name="dt" value="home" checked onchange="calcD()"><span>🏠 للمنزل</span><div id="pH" style="font-size:12px;color:var(--g);margin-top:3px">-</div></label>
-<label><input type="radio" name="dt" value="desk" onchange="calcD()"><span>🏢 مكتب التوصيل</span><div id="pD" style="font-size:12px;color:var(--g);margin-top:3px">-</div></label></div>
-<textarea class="inp" required id="fA" rows="2" placeholder="العنوان التفصيلي *"></textarea>`}
-<div id="sumBox" style="background:var(--bg);padding:12px;border-radius:8px;margin-bottom:12px"></div>
-<button class="btn btn-p" style="width:100%;${allDig?'background:#0ea5e9':''}"><i class="fas fa-check"></i> ${allDig?'تأكيد واستلام فوراً ⚡':'تأكيد الطلب'}</button>
-<button type="button" class="btn btn-w" style="width:100%;margin-top:8px" onclick="waFull()"><i class="fab fa-whatsapp"></i> أرسل الطلب عبر واتساب</button>
-</form>`;
-calcD();document.getElementById('co').classList.add('on')}
+/* ===== إتمام الطلب وإظهار صورة واسم المنتج في الأعلى ===== */
+function checkout(){
+  if(!cart.length) return showToast('السلة فارغة');
+  closeAll();
+  const allDig = cart.every(c => c.c === 'digital');
+
+  const productsItemsHTML = cart.map(item => {
+    const pName = item.n || item.t || item.title || item.name || 'منتج';
+    const pImg = item.img || item.image || '';
+    const pQty = item.q || item.qty || 1;
+    const pPrice = (item.p || item.price || 0);
+
+    return `
+      <div style="display:flex;align-items:center;gap:12px;background:#f8fafc;padding:10px;border-radius:10px;margin-bottom:12px;border:1px solid var(--bd)">
+        <div style="width:60px;height:60px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#fff;border:1px solid var(--bd)">
+          ${pImg ? `<img src="${pImg}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--g)"><i class="fas fa-box"></i></div>`}
+        </div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px;line-height:1.2">${pName}</div>
+          <div style="font-size:13px;color:var(--p);font-weight:700">${pPrice.toLocaleString()} د.ج ${pQty > 1 ? `<small style="color:var(--g);font-weight:normal">(x${pQty})</small>` : ''}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  coBody.innerHTML=`<h2 style="margin-bottom:12px"><i class="fas fa-${allDig?'bolt':'shopping-cart'}"></i> مراجعة الطلب</h2>
+  ${productsItemsHTML}
+  <form onsubmit="return done(event)">
+  <input class="inp" required id="fN" placeholder="الاسم الكامل *">
+  <input class="inp" required id="fP" type="tel" placeholder="رقم الهاتف *" pattern="0[567][0-9]{8}">
+  <input class="inp" ${allDig?'required':''} id="fE" type="email" placeholder="البريد الإلكتروني ${allDig?'*':'(اختياري)'}">
+  ${allDig?'':`<select class="inp" required id="fW" onchange="calcD()"><option value="">اختر الولاية *</option>${W.map((w,i)=>`<option value="${i}">${String(i+1).padStart(2,'0')} - ${w[0]}</option>`).join('')}</select>
+  <div class="dlv"><label><input type="radio" name="dt" value="home" checked onchange="calcD()"><span>🏠 للمنزل</span><div id="pH" style="font-size:12px;color:var(--g);margin-top:3px">-</div></label>
+  <label><input type="radio" name="dt" value="desk" onchange="calcD()"><span>🏢 مكتب التوصيل</span><div id="pD" style="font-size:12px;color:var(--g);margin-top:3px">-</div></label></div>
+  <textarea class="inp" required id="fA" rows="2" placeholder="العنوان التفصيلي (البلدية والحي) *"></textarea>`}
+  <div id="sumBox" style="background:var(--bg);padding:12px;border-radius:8px;margin-bottom:12px"></div>
+  <button class="btn btn-p" style="width:100%;${allDig?'background:#0ea5e9':''}"><i class="fas fa-check"></i> تأكيد الطلب الآن</button>
+  <button type="button" class="btn btn-w" style="width:100%;margin-top:8px" onclick="waFull()"><i class="fab fa-whatsapp"></i> أطلب عبر واتساب</button>
+  </form>`;
+  calcD();
+  document.getElementById('co').classList.add('on');
+}
 
 
 function calcD(){const allDig=cart.every(c=>c.c==='digital');const sub=cart.reduce((s,c)=>s+c.p*c.q,0);
