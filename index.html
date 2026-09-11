@@ -333,17 +333,17 @@ function card(x) {
     const dg = x.c === 'digital';
     return `<div class="card">
         <div class="cimg" onclick="detail(${x.id})">
-            <div class="bdgs">${x.b === 'sale' ? `<span class="bdg sale">-${off}%</span>` : ''}${x.b === 'new' ? '<span class="bdg new">جديد</span>' : ''}</div>
+            <div class="bdgs">${x.b === 'sale' ? '<span class="bdg sale">-' + off + '%</span>' : ''}${x.b === 'new' ? '<span class="bdg new">جديد</span>' : ''}</div>
             <div class="acts"><button class="abtn ${l ? 'liked' : ''}" onclick="event.stopPropagation();tw(${x.id})"><i class="fas fa-heart"></i></button></div>
         </div>
         <div class="cinfo">
             <span class="ccat">${CN[x.c]}</span>
             <h3 class="cname" onclick="detail(${x.id})">${x.n}</h3>
             <div class="rate"><span class="st">${stars(x.r)}</span><small>(${x.rv})</small></div>
-            <div class="price"><span class="now">${fmt(x.p)}</span>${x.o ? `<span class="old">${fmt(x.o)}</span>` : ''}</div>
+            <div class="price"><span class="now">${fmt(x.p)}</span>${x.o ? '<span class="old">' + fmt(x.o) + '</span>' : ''}</div>
             <div style="display:flex;gap:5px;margin-top:10px">
                 <button class="atc" style="flex:1;background:#eee;color:#333;border:1px solid #ccc;padding:8px 0" onclick="add(${x.id})"><i class="fas fa-cart-plus"></i></button>
-                <button class="atc" style="flex:2;background:#27ae60;color:#fff;font-weight:bold;border:none;padding:8px 0" onclick="add(${x.id});checkout()"><i class="fas fa-bolt"></i> اطلب الآن</button>
+                <button class="atc" style="flex:2;background:#27ae60;color:#fff;font-weight:bold;border:none;padding:8px 0;cursor:pointer" onclick="add(${x.id});checkout()"><i class="fas fa-bolt"></i> اطلب الآن</button>
             </div>
         </div>
     </div>`;
