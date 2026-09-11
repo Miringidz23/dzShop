@@ -333,9 +333,10 @@ function card(x) {
   var dg = x.c === 'digital';
   var badge = (x.b === 'sale' ? '<span class="bdg sale">-' + off + '%</span>' : '') + (x.b === 'new' ? '<span class="bdg new">جديد</span>' : '');
   var oldP = x.o ? '<span class="old">' + fmt(x.o) + '</span>' : '';
-  var imgUrl = dg ? 'linear-gradient(135deg,#e0f2fe,#f1f5f9)' : 'url(' + x.i + ')';
+  var bg = dg ? 'linear-gradient(135deg,#e0f2fe,#f1f5f9)' : 'url(' + x.i + ')';
+  
   var res = '<div class="card">';
-  res += '<div class="cimg" onclick="detail(' + x.id + ')" style="background-image:' + imgUrl + '; background-size:cover; background-position:center">';
+  res += '<div class="cimg" onclick="detail(' + x.id + ')" style="background-image:' + bg + '; background-size:cover; background-position:center">';
   res += '<div class="bdgs">' + badge + '</div>';
   res += '<div class="acts"><button class="abtn ' + (l ? 'liked' : '') + '" onclick="event.stopPropagation();tw(' + x.id + ')"><i class="fas fa-heart"></i></button></div>';
   res += '</div><div class="cinfo">';
@@ -351,12 +352,27 @@ function card(x) {
 }
 
 function paint(){
-  if(dgGrid) dgGrid.innerHTML=P.filter(x=>x.c==='digital').map(card).join('');
-  if(flashGrid) flashGrid.innerHTML=P.filter(x=>x.b==='sale').map(card).join('');
-  if(bestGrid) bestGrid.innerHTML=P.filter(x=>x.b==='hot').map(card).join('');
+  var dgGrid = document.getElementById('grid');
+  var flashGrid = document.getElementById('flashGrid');
+  var bestGrid = document.getElementById('bestGrid');
+  if(dgGrid) dgGrid.innerHTML=P.filter(function(x){return x.c==='digital'}).map(card).join('');
   render();
 }
 
+function render(){
+  var l=P.filter(function(x){
+    return (cf==='all'||x.c===cf)&&(!sq||x.n.includes(sq)||x.d.includes(sq));
+  });
+  var gridEl = document.getElementById('grid');
+  if(gridEl) gridEl.innerHTML=l.length?l.map(card).join(''):'<div class="empty">لا توجد نتائج</div>';
+}
+
+function filt(c,el){
+  cf=c;sq='';
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on')});
+  if(el)el.classList.add('on');
+  render();
+}
 function render(){
   let l=P.filter(x=>(cf==='all'||x.c===cf)&&(!sq||x.n.includes(sq)||x.d.includes(sq)));
   grid.innerHTML=l.length?l.map(card).join(''):'<div class="empty">لم يتم العثور على نتائج</div>';
