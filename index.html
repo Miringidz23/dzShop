@@ -572,6 +572,17 @@ if(innerWidth<680){const s=document.createElement('style');s.textContent='.pdg{g
 // إعادة إرسال الطلبات المعلقة محلياً إن وجدت
 (function(){const q=JSON.parse(localStorage.getItem('pending')||'[]');
 if(q.length&&CRM_URL){localStorage.removeItem('pending');q.forEach(o=>sendToCRM(o))}})();
+  /* ===== فتح المنتج مباشرة عبر رابط الإعلان ===== */
+window.addEventListener('load', function() {
+  const params = new URLSearchParams(window.location.search);
+  const pid = params.get('p') || params.get('id');
+  if (!pid) return;
+  const prod = P.find(i => i.id == pid);
+  if (!prod) return;
+  add(prod.id);
+  showToast('🛒 تم اختيار المنتج! أكمل معلوماتك للطلب');
+  setTimeout(function(){ try { checkout(); } catch(e){} }, 400);
+});
 </script>
 </body>
   </html>
