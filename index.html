@@ -435,7 +435,7 @@ function sendToCRM(order){
 
   // تجميع أسماء المنتجات الموجودة في السلة بدقة
   const productNames = cart.map(item => item.n || item.t || item.title || item.name || 'منتج').join(' + ');
-  const totalQty = cart.reduce((sum, item) => sum + (item.q || item.qty || 1), 0);
+  const totalQty = cart.length;
 
   // إرفاق اسم المنتج والمبلغ الكلي داخل بيانات الطلب
   const enrichedOrder = {
@@ -446,7 +446,7 @@ function sendToCRM(order){
     items: cart.map(i => ({
       name: i.n || i.t || i.title || i.name,
       price: i.p || i.price,
-      quantity: i.q || i.qty || 1
+      quantity: 1,
     }))
   };
 
@@ -480,7 +480,7 @@ function checkout(){
         </div>
         <div style="flex:1">
           <div style="font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px;line-height:1.2">${pName}</div>
-          <div style="font-size:13px;color:var(--p);font-weight:700">${pPrice.toLocaleString()} د.ج ${pQty > 1 ? `<small style="color:var(--g);font-weight:normal">(x${pQty})</small>` : ''}</div>
+         <div style="font-size:13px;color:var(--p);font-weight:700">${pPrice.toLocaleString()} د.ج</div>
         </div>
       </div>
     `;
@@ -505,7 +505,7 @@ function checkout(){
 }
 
 
-function calcD(){const allDig=cart.every(c=>c.c==='digital');const sub=cart.reduce((s,c)=>s+c.p*c.q,0);
+function calcD(){const allDig=cart.every(c=>c.c==='digital');const sub=cart.reduce((s,c)=>s+c.p,0);
 let ship=0;
 if(!allDig){const w=document.getElementById('fW');
 if(w&&w.value!==''){const wi=W[+w.value];document.getElementById('pH').textContent=wi[1]+' '+CUR;document.getElementById('pD').textContent=wi[2]+' '+CUR;
