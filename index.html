@@ -361,7 +361,10 @@ ${dg?`<div style="background:rgba(14,165,233,.1);padding:11px;border-radius:8px;
 <div><i class="fas fa-truck"></i> توصيل لكل الولايات 58</div><div style="margin-top:4px"><i class="fas fa-money-bill-wave"></i> الدفع عند الاستلام</div></div>
 <div class="qty" style="margin-bottom:14px"><button onclick="mq(-1)">-</button><span id="mQ">1</span><button onclick="mq(1)">+</button></div>`}
 <div style="display:flex;gap:8px;flex-wrap:wrap">
-<button class="btn btn-p" ${dg?'style="background:#0ea5e9"':''} onclick="add(${x.id},${dg?1:"+document.getElementById('mQ').textContent"});cls('pd')"><i class="fas fa-cart-plus"></i> أضف للسلة</button>
+<div style="display: flex; gap: 8px; margin-top: 10px; width: 100%;">
+   <button class="btn btn-p" style="flex: 1;" onclick="add(${$x.id})">أضف للسلة</button>
+   <button class="btn" style="flex: 2; background: #27ae60; color: white; font-weight: bold; border: none; border-radius: 8px;" onclick="add(${$x.id}); checkout();">اطلب الآن</button>
+</div>
 <button class="btn btn-w" onclick="waOne(${x.id})"><i class="fab fa-whatsapp"></i> اطلب واتساب</button></div></div></div>
 <div class="tabs"><button class="tab on" onclick="tb(0,this)">الوصف</button><button class="tab" onclick="tb(1,this)">المواصفات</button><button class="tab" onclick="tb(2,this)">التقييمات (${all.length})</button></div>
 <div id="tbC"></div>`;
@@ -413,7 +416,10 @@ function openCart(){drawCart();cartD.classList.add('on');ov.classList.add('on')}
 function openWish(){const L=P.filter(x=>wish.includes(x.id));
 wishBody.innerHTML=L.length?L.map(x=>`<div class="citem"><div class="ci">${x.img?`<img src="${x.img}">`:`<i class="${x.i}"></i>`}</div>
 <div style="flex:1"><h4>${x.n}</h4><span style="color:var(--p);font-weight:700">${fmt(x.p)}</span>
-<button class="btn btn-p" style="padding:6px 12px;font-size:12px;margin-top:6px" onclick="add(${x.id})">أضف للسلة</button></div>
+<div style="display: flex; gap: 4px; margin-top: 6px;">
+   <button class="btn btn-p" style="flex: 1; padding: 6px 2px; font-size: 11px;" onclick="add(${x.id})">السلة</button>
+   <button class="btn" style="flex: 2; padding: 6px 2px; font-size: 11px; background: #27ae60; color: white; border: none; border-radius: 4px; font-weight: bold;" onclick="add(${x.id}); checkout();">شراء الآن</button>
+</div>
 <button class="del" onclick="tw(${x.id});openWish()"><i class="fas fa-times"></i></button></div>`).join(''):'<div class="empty"><i class="fas fa-heart"></i><h3>لا توجد مفضلات</h3></div>';
 wishD.classList.add('on');ov.classList.add('on')}
 function closeAll(){document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('on'));ov.classList.remove('on')}
