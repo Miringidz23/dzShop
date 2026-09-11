@@ -395,7 +395,7 @@ localStorage.setItem('wish',JSON.stringify(wish));wCount.textContent=wish.length
 
 function drawCart(){const b=cartBody,f=cartFoot;
 if(!cart.length){b.innerHTML='<div class="empty"><i class="fas fa-shopping-cart"></i><h3>السلة فارغة</h3></div>';f.innerHTML='';return}
-b.innerHTML=cart.map(c=>`<div class="citem"><div class="ci" ${c.c==='digital'?'style="background:rgba(14,165,233,.15);color:#0ea5e9"':''}>${c.img?`<img src="${c.img}">`:`<i class="${c.i}"></i>`}</div>
+b.innerHTML=cart.map(c=>'<div class="citem"><div class="ci">...<div style="flex:1"><h4>${c.n}</h4><span style="color:var(--p);font-weight:700">${fmt(c.p)}</span>...<button class="del" onclick="del(${c.id})"><i class="fas fa-trash-alt"></i></button></div>').join('');
 <div style="flex:1"><h4>${c.n}</h4><span style="color:var(--p);font-weight:700">${fmt(c.p*c.q)}</span>
 ${c.c==='digital'?'<div style="font-size:11px;color:#0ea5e9;margin-top:5px"><i class="fas fa-bolt"></i> تسليم فوري</div>':`<div class="qty"><button onclick="qty(${c.id},-1)">-</button><span>${c.q}</span><button onclick="qty(${c.id},1)">+</button></div>`}</div>
 <button class="del" onclick="del(${c.id})"><i class="fas fa-trash-alt"></i></button></div>`).join('');
