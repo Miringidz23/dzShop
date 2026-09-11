@@ -326,7 +326,6 @@ document.getElementById('waF').href="https://wa.me/"+WA;
 function fmt(n){return n.toLocaleString('en-US')+' '+CUR}
 function stars(r){let s='';for(let i=1;i<=5;i++)s+=i<=Math.floor(r)?'<i class="fas fa-star"></i>':(i-r<1?'<i class="fas fa-star-half-alt"></i>':'<i class="far fa-star"></i>');return s}
 function cls(id){document.getElementById(id).classList.remove('on')}
-
 function card(x) {
     var off = x.o ? Math.round((1 - x.p / x.o) * 100) : 0;
     var l = wish.includes(x.id);
@@ -334,11 +333,11 @@ function card(x) {
     var badge = (x.b === 'sale' ? '<span class="bdg sale">-' + off + '%</span>' : '') + (x.b === 'new' ? '<span class="bdg new">جديد</span>' : '');
     var oldP = x.o ? '<span class="old">' + fmt(x.o) + '</span>' : '';
     
-    // تحديد نمط الخلفية: صورة للمنتجات العادية، وتدرج لوني للمنتجات الرقمية
-    var style = dg ? 'background:linear-gradient(135deg,#e0f2fe,#f1f5f9)' : 'background-image:url(' + x.i + ')';
+    // تحديد رابط الصورة أو التدرج اللوني
+    var imgUrl = dg ? 'linear-gradient(135deg,#e0f2fe,#f1f5f9)' : 'url(' + x.i + ')';
 
     var res = '<div class="card">';
-    res += '<div class="cimg" onclick="detail(' + x.id + ')" style="' + style + '; background-size:cover; background-position:center;">';
+    res += '<div class="cimg" onclick="detail(' + x.id + ')" style="background-image:' + imgUrl + '; background-size:cover; background-position:center;">';
     res += '<div class="bdgs">' + badge + '</div>';
     res += '<div class="acts"><button class="abtn ' + (l ? 'liked' : '') + '" onclick="event.stopPropagation();tw(' + x.id + ')"><i class="fas fa-heart"></i></button></div>';
     res += '</div>';
@@ -348,12 +347,13 @@ function card(x) {
     res += '<div class="rate"><span class="st">' + stars(x.r) + '</span><small>(' + x.rv + ')</small></div>';
     res += '<div class="price"><span class="now">' + fmt(x.p) + '</span>' + oldP + '</div>';
     res += '<div style="display:flex;gap:5px;margin-top:10px">';
-    res += '<button class="atc" style="flex:1;margin:0;padding:8px 0;background:#eee;color:#333;border:1px solid #ccc" onclick="add(' + x.id + ')"><i class="fas fa-cart-plus"></i></button>';
-    res += '<button class="atc" style="flex:2.5;margin:0;padding:8px 0;background:#27ae60;color:#fff;font-weight:bold;border:none;border-radius:4px" onclick="add(' + x.id + ');checkout()">اطلب الآن</button>';
+    res += '<button class="atc" style="flex:1;background:#eee;color:#333;border:1px solid #ccc;padding:8px 0" onclick="add(' + x.id + ')"><i class="fas fa-cart-plus"></i></button>';
+    res += '<button class="atc" style="flex:2.5;background:#27ae60;color:#fff;font-weight:bold;border:none;border-radius:4px;padding:8px 0;cursor:pointer" onclick="add(' + x.id + ');checkout()">اطلب الآن</button>';
     res += '</div></div></div>';
     
     return res;
 }
+
 /* ===== صفحة تفاصيل المنتج ===== */
 function detail(id){curP=P.find(p=>p.id===id);const x=curP,dg=x.c==='digital';
 const all=[...(DR[id]||[]),...(revs[id]||[])];
