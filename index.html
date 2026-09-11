@@ -327,27 +327,36 @@ function fmt(n){return n.toLocaleString('en-US')+' '+CUR}
 function stars(r){let s='';for(let i=1;i<=5;i++)s+=i<=Math.floor(r)?'<i class="fas fa-star"></i>':(i-r<1?'<i class="fas fa-star-half-alt"></i>':'<i class="far fa-star"></i>');return s}
 function cls(id){document.getElementById(id).classList.remove('on')}
 
-function card(x){const off=x.o?Math.round((1-x.p/x.o)*100):0,l=wish.includes(x.id),dg=x.c==='digital';
-return `<div class="card"><div class="cimg" onclick="detail(${x.id})" style="background:${dg?'linear-gradient(135deg,#e0f2fe,#f1f5f9)':'url('+x.i+')'};background-size:cover;background-position:center">
-<div class="bdgs">${x.b==='sale'?`<span class="bdg sale">-${off}%</span>`:''}${x.b==='new'?'<span class="bdg new">جديد</span>':''}</div>
-<div class="acts"><button class="abtn ${l?'liked':''}" onclick="event.stopPropagation();tw(${x.id})"><i class="fas fa-heart"></i></button></div>
-</div><div class="cinfo"><span class="ccat">${CN[x.c]}</span><h3 class="cname" onclick="detail(${x.id})">${x.n}</h3>
-<div class="rate"><span class="st">${stars(x.r)}</span><small>(${x.rv})</small></div>
-<div class="price"><span class="now">${fmt(x.p)}</span>${x.o?`<span class="old">${fmt(x.o)}</span>`:''}</div>
-<div style="display:flex;gap:5px;margin-top:8px"><button class="atc" style="flex:1;margin:0;padding:8px 0;background:#eee;color:#333;border:1px solid #ccc" onclick="add(${x.id})"><i class="fas fa-cart-plus"></i></button>
-<button class="atc" style="flex:2;margin:0;padding:8px 0;background:#27ae60;color:#fff;font-weight:bold;border:none" onclick="add(${x.id});checkout()">اطلب الآن</button></div></div></div>`;
-  }
-function paint(){digGrid.innerHTML=P.filter(x=>x.c==='digital').map(card).join('');
-flashGrid.innerHTML=P.filter(x=>x.fl).map(card).join('');
-bestGrid.innerHTML=P.filter(x=>x.best).map(card).join('');render()}
-function render(){let L=P.filter(x=>(cf==='all'||x.c===cf)&&(!sq||x.n.includes(sq)||x.d.includes(sq)));
-grid.innerHTML=L.length?L.map(card).join(''):'<div class="empty" style="grid-column:1/-1"><i class="fas fa-search"></i><h3>لا توجد نتائج</h3></div>'}
-function filt(c,el){cf=c;sq='';sInput.value='';document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
-if(el)el.classList.add('on');else{const b=[...document.querySelectorAll('.fbtn')].find(b=>b.textContent.trim()===(c==='all'?'الكل':CN[c]));if(b)b.classList.add('on')}
-render();prods.scrollIntoView({behavior:'smooth'})}
-function doSearch(){sq=sInput.value.trim();cf='all';render();prods.scrollIntoView({behavior:'smooth'})}
-sInput.addEventListener('keypress',e=>{if(e.key==='Enter')doSearch()});
+function card(x) {
+    var off = x.o ? Math.round((1 - x.p / x.o) * 100) : 0;
+    var l = wish.includes(x.id);
+    var dg = (x.c === 'digital');
+    var badge = (x.b === 'sale' ? '<span class="bdg sale">-' + off + '%</span>' : '') + (x.b === 'new' ? '<span class="bdg new">جديد</span>' : '');
+    var oldP = x.o ? '<span class="old">' + fmt(x.o) + '</span>' : '';
+    
+    // تصحيح منطق الصورة
+    var imgStyle = '';
+    if (dg) {
+        imgStyle = 'background: linear-gradient(135deg,#e0f2fe,#f1f5f9);';
+    } else {
+        imgStyle = 'background-image: url(\'' + x.i + '\'); background-size: cover; background-position: center;';
+    }
 
+    return '<div class="card">' +
+        '<div class="cimg" onclick="detail(' + x.id + ')" style="' + imgStyle + '">' +
+        '<div class="bdgs">' + badge + '</div>' +
+        '<div class="acts"><button class="abtn ' + (l ? 'liked' : '') + '" onclick="event.stopPropagation();tw(' + x.id + ')"><i class="fas fa-heart"></i></button></div>' +
+        '</div>' +
+        '<div class="cinfo">' +
+        '<span class="ccat">' + CN[x.c] + '</span>' +
+        '<h3 class="cname" onclick="detail(' + x.id + ')">' + x.n + '</h3>' +
+        '<div class="rate"><span class="st">' + stars(x.r) + '</span><small>(' + x.rv + ')</small></div>' +
+        '<div class="price"><span class="now">' + fmt(x.p) + '</span>' + oldP + '</div>' +
+        '<div style="display:flex;gap:5px;margin-top:10px">' +
+        '<button class="atc" style="flex:1;margin:0;padding:8px 0;background:#eee;color:#333;border:1px solid #ccc" onclick="add(' + x.id + ')"><i class="fas fa-cart-plus"></i></button>' +
+        '<button class="atc" style="flex:2.5;margin:0;padding:8px 0;background:#27ae60;color:#fff;font-weight:bold;border:none" onclick="add(' + x.id + ');checkout()">اطلب الآن</button>' +
+        '</div></div></div>';
+}
 /* ===== صفحة تفاصيل المنتج ===== */
 function detail(id){curP=P.find(p=>p.id===id);const x=curP,dg=x.c==='digital';
 const all=[...(DR[id]||[]),...(revs[id]||[])];
