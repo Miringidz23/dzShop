@@ -313,46 +313,77 @@ const P=[
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === Sync Products from CRM ===
+// === Sync Products from CRM (نسخة التشخيص المتقدمة) ===
 async function syncStore() {
+  console.log("🚀 [1] بدأ الاتصال بالسيرفر...");
+  
   try {
     const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
-    const data = await res.json();
+    
+    if (!res.ok) {
+      console.error("❌ خطأ في الاستجابة من السيرفر:", res.status);
+      return;
+    }
 
-    if (Array.isArray(data) && data.length > 0) {
-      const newItems = data.map(item => ({
-        id: item.id || Date.now(),
-        n: item.name,
+    const rawData = await res.json();
+    console.log("📦 [2] البيانات المستلمة من السيرفر كاملة:", rawData);
+
+    // استخراج المصفوفة سواء جاءت مباشرة أو داخل كائن (Array or Object)
+    let productsArray = [];
+    if (Array.isArray(rawData)) {
+      productsArray = rawData;
+    } else if (rawData && Array.isArray(rawData.products)) {
+      productsArray = rawData.products;
+    } else if (rawData && Array.isArray(rawData.data)) {
+      productsArray = rawData.data;
+    }
+
+    console.log("📊 [3] عدد المنتجات التي تم العثور عليها:", productsArray.length);
+
+    if (productsArray.length > 0) {
+      const newItems = productsArray.map(item => ({
+        id: item.id || item._id || Date.now(),
+        n: item.name || item.title || "منتج",
         p: Number(item.price) || 0,
         o: Number(item.oldPrice) || 0,
-        c: "fashion",
-        i: item.image || "",
+        c: item.category || "fashion",
+        i: item.image || item.img || "",
         r: 5.0,
         rv: 45,
-        b: item.oldPrice > item.price ? "sale" : "new",
-        d: item.name
+        b: (item.oldPrice && item.oldPrice > item.price) ? "sale" : "new",
+        d: item.description || item.name || ""
       }));
 
-      // إضافة المنتجات الجديدة في بداية القائمة P
+      // إدراج المنتجات في بداية المصفوفة P
       P.unshift(...newItems);
 
-      // إعادة رسم شبكة المنتجات
-      const grid = document.querySelector('.products-grid') || document.getElementById('products');
-      
+      // البحث عن العنصر في الصفحة (جرب كل الاحتمالات)
+      const grid = document.querySelector('.products-grid') || 
+                   document.getElementById('products') || 
+                   document.querySelector('.grid') ||
+                   document.querySelector('#app');
+
+      console.log("🎯 [4] عنصر الـ Grid الذي تم العثور عليه في الصفحة:", grid);
+
       if (grid && typeof card === 'function') {
+        // رسم جميع المنتجات في الصفحة
         grid.innerHTML = P.map(x => card(x)).join('');
+        console.log("✅ [5] تم رسم المنتجات في الواجهة بنجاح!");
       } else {
-        console.error("لم يتم العثور على عنصر شبكة المنتجات أو دالة card غير معرفة!");
+        console.error("❌ [خطأ]: لم يتم العثور على المكان المخصص لرسم المنتجات في الـ HTML أو أن دالة card غير موجودة.");
       }
+    } else {
+      console.warn("⚠️ [تنبيه]: السيرفر استجاب لكن لا توجد منتجات داخل القائمة.");
     }
+
   } catch (e) {
-    console.error("خطأ في الاتصال بالـ CRM:", e);
-    // إعادة المحاولة بعد 5 ثواني
+    console.error("💥 [خطأ في الاتصال]:", e);
+    // إعادة المحاولة بعد 5 ثواني في حال كان السيرفر نائماً
     setTimeout(syncStore, 5000);
   }
 }
 
-// تشغيل المزامنة بعد ثانية واحدة من تحميل الصفحة
+// تشغيل بعد تحميل الصفحة
 setTimeout(syncStore, 1000);
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
