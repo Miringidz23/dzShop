@@ -313,34 +313,48 @@ let P = [
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === كود جلب السلعة من CRM ===
+// === كود جلب السلعة من CRM (بالصور والتصنيفات الصحيحة) ===
 async function syncStore() {
   try {
     const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
     const data = await res.json();
 
     if (data && data.length > 0) {
-      const newItems = data.map(item => ({
-        id: item.id,
-        n: item.name,
-        p: item.price,
-        o: item.price + 500, 
-        c: "digital", 
-        i: "fas fa-box", 
-        r: 5, rv: 25, b: "جديد", d: item.name
-      }));
+      const newItems = data.map(item => {
+        // معالجة رابط الصورة (سواء كان رابط كامل أو صورة مرفوعة في CRM)
+        let imgUrl = item.image || item.img || "";
+        if (imgUrl && !imgUrl.startsWith("http") && !imgUrl.startsWith("fas")) {
+          imgUrl = "https://crm-app-6t6b.onrender.com" + imgUrl;
+        }
+
+        return {
+          id: item.id || Date.now(),
+          n: item.name,
+          p: Number(item.price) || 0,
+          o: Number(item.oldPrice) || (Number(item.price) + 500),
+          c: item.category || "fashion", // التصنيف القادم من CRM (مثل: fashion, electronics, home...)
+          i: imgUrl || "fas fa-box",     // رابط الصورة أو أيقونة افتراضية
+          r: 5, 
+          rv: 25, 
+          b: (item.oldPrice && item.oldPrice > item.price) ? "sale" : "new", 
+          d: item.name
+        };
+      });
 
       P.unshift(...newItems); // إضافة السلعة الجديدة لأول القائمة
       
-      // استدعاء دالة الرسم (تأكد من وجود دالة paint أو render في كودك)
-      if (typeof paint === 'function') paint(); 
-      console.log("✅ تمت المزامنة!");
+      // إعادة رسم الصفحة لتحديث الأقسام والصور
+      if (typeof paint === 'function') paint();
+      if (typeof render === 'function') render();
+      
+      console.log("✅ تمت المزامنة بالصور والأقسام الصحيحة!");
     }
   } catch (e) {
-    console.log("❌ خطأ CORS: لازم تفعل CORS في سيرفر Render");
+    console.log("❌ خطأ في المزامنة:", e);
   }
 }
-setTimeout(syncStore, 1000); // تشغيل بعد ثانية واحدة
+
+setTimeout(syncStore, 1000);
 
 
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
