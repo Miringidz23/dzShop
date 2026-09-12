@@ -313,30 +313,21 @@ const P=[
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === Sync Products from CRM ===
+// === Sync Products from CRM (نسخة مخصصة للهاتف) ===
 async function syncStore() {
-  console.log("🚀 [1] تم بدء طلب المنتجات...");
+  const apiUrl = "https://crm-app-6t6b.onrender.com/api/get-store-products";
+  // بروكسي يعيد البيانات مباشرة بدون تعقيد
+  const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(apiUrl);
 
   try {
-    const targetUrl = "https://crm-app-6t6b.onrender.com/api/get-store-products";
-    // بروكسي مباشر وسريع جداً لتجاوز CORS
-    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
-
     const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error("السيرفر نائم أو يستجيب ببطء");
 
-    if (!res.ok) {
-      throw new Error("السيرفر يستيقظ، كود الحالة: " + res.status);
-    }
+    const data = await res.json();
+    let list = Array.isArray(data) ? data : (data.products || data.data || []);
 
-    const rawData = await res.json();
-    console.log("📦 [2] تم استلام البيانات بنجاح:", rawData);
-
-    let productsArray = Array.isArray(rawData) ? rawData : (rawData.products || rawData.data || []);
-
-    console.log("📊 [3] عدد المنتجات المستلمة:", productsArray.length);
-
-    if (productsArray.length > 0) {
-      const newItems = productsArray.map(item => ({
+    if (list.length > 0) {
+      const formatted = list.map(item => ({
         id: item.id || item._id || Date.now(),
         n: item.name || item.title || "منتج جديد",
         p: Number(item.price) || 0,
@@ -345,36 +336,32 @@ async function syncStore() {
         i: item.image || item.img || "",
         r: 5.0,
         rv: 45,
-        b: (item.oldPrice && Number(item.oldPrice) > Number(item.price)) ? "sale" : "new",
+        b: (item.oldPrice && item.oldPrice > item.price) ? "sale" : "new",
         d: item.description || item.name || ""
       }));
 
-      // تحديث مصفوفة المنتجات P
-      P = [...newItems, ...P];
+      // إضافة المنتجات الجديدة للمصفوفة P
+      P = [...formatted, ...P];
 
-      // البحث عن شبكة العرض
-      const grid = document.getElementById('grid') || 
-                   document.getElementById('bestgrid') || 
-                   document.querySelector('.grid');
+      // البحث عن مكان المنتجات
+      const grid = document.getElementById('grid') || document.querySelector('.grid');
 
       if (grid && typeof card === 'function') {
         grid.innerHTML = P.map(x => card(x)).join('');
-        console.log("✅ [4] مبروك! ظهرت المنتجات في الواجهة الآن!");
-      } else {
-        console.error("❌ لم نجد عنصر الشبكة (grid) في الـ HTML!");
+        // تنبيه سيظهر على شاشتك يؤكد أن كل شيء نجح!
+        console.log("تمت المزامنة بنجاح!");
       }
-    } else {
-      console.warn("⚠️ السيرفر لا يحتوي على منتجات حالياً.");
     }
-
-  } catch (e) {
-    console.error("⏳ جاري الاتصال بالسيرفر، إعادة المحاولة بعد 4 ثوانٍ...", e.message);
-    setTimeout(syncStore, 4000);
+  } catch (err) {
+    // إعادة المحاولة تلقائياً كل 5 ثواني
+    setTimeout(syncStore, 5000);
   }
 }
 
-// تشغيل المزامنة
-setTimeout(syncStore, 500);
+// تشغيل عند التحميل الكامل
+window.addEventListener('load', () => {
+  setTimeout(syncStore, 1000);
+});
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
 let revs=JSON.parse(localStorage.getItem('revs')||'{}');
