@@ -314,7 +314,7 @@ const P=[
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
 const DR={21:[["أمين ب.",5,"دورة ممتازة، شرح واضح جداً والمشاريع مفيدة 👌"],["سارة م.",5,"أحسن دورة برمجة عربية، نصحت بها كل أصدقائي"],["يوسف ك.",4,"محتوى قوي بس يحتاج تحديث في بعض الأجزاء"]],1:[["كريم ز.",5,"جهاز رائع والتوصيل كان سريع لولاية وهران"],["نبيل ع.",4,"ممتاز لكن السعر مرتفع شوية"]],7:[["محمد ص.",5,"أصلي 100% ومريح جداً في المشي"],["ريان ت.",4,"جميل بس المقاس جاء أصغر شوية"]]};
-// === النسخة المضمونة لجلب السلعة من الـ CRM ===
+// === Sync Products from CRM ===
 async function syncStore() {
     try {
         const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
@@ -329,7 +329,7 @@ async function syncStore() {
                 c: "fashion",
                 i: item.image || "",
                 r: 5.0,
-                rv: 20,
+                rv: 25,
                 b: item.oldPrice > item.price ? "sale" : "new",
                 d: item.name
             }));
@@ -344,9 +344,7 @@ async function syncStore() {
     }
 }
 
-syncStore();
-
-// تشغيل المزامنة
+// Start Sync
 syncStore();
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
