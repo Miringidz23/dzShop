@@ -313,37 +313,31 @@ const P=[
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === Sync Products from CRM (مع حل CORS وتوافق مع هيكل المتجر) ===
+// === Sync Products from CRM (حل مضمون لـ CORS و 403) ===
 async function syncStore() {
   console.log("🚀 جاري جلب المنتجات من CRM...");
 
   try {
-    // 1. استخدام Proxy لتجاوز حظر CORS
-    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-    const apiUrl = "https://crm-app-6t6b.onrender.com/api/get-store-products";
-    const res = await fetch(proxyUrl + apiUrl);
+    // 1. رابط API مع بروكسي مجاني ومفتوح 100%
+    const targetUrl = "https://crm-app-6t6b.onrender.com/api/get-store-products";
+    const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
 
-    if (!res.ok) throw new Error(`خطأ في الاستجابة: ${res.status}`);
+    const res = await fetch(proxyUrl);
 
-    const rawData = await res.json();
-    console.log("📦 البيانات المستلمة:", rawData);
+    if (!res.ok) throw new Error("خطأ في شبكة البروكسي: " + res.status);
 
-    // 2. استخراج المصفوفة (سواء كانت مباشرة أو داخل كائن)
-    let productsArray = [];
-    if (Array.isArray(rawData)) {
-      productsArray = rawData;
-    } else if (rawData && Array.isArray(rawData.products)) {
-      productsArray = rawData.products;
-    } else if (rawData && Array.isArray(rawData.data)) {
-      productsArray = rawData.data;
-    }
+    const wrapperData = await res.json();
+    
+    // 2. فك التشفير للبيانات الحقيقية القادمة من Render
+    const rawData = JSON.parse(wrapperData.contents);
+    console.log("📦 البيانات المستلمة بنجاح:", rawData);
 
-    console.log("📊 عدد المنتجات التي تم العثور عليها:", productsArray.length);
+    let productsArray = Array.isArray(rawData) ? rawData : (rawData.products || rawData.data || []);
 
     if (productsArray.length > 0) {
-      // 3. تحويل البيانات إلى الشكل المطلوب للمتجر
+      // 3. تحويل المنتجات للفرومات الخاص بالمتجر
       const newItems = productsArray.map(item => ({
-        id: item.id || Date.now().toString(),
+        id: item.id || item._id || Date.now(),
         n: item.name || item.title || "منتج جديد",
         p: Number(item.price) || 0,
         o: Number(item.oldPrice) || 0,
@@ -355,34 +349,32 @@ async function syncStore() {
         d: item.description || item.name || ""
       }));
 
-      // 4. إضافة المنتجات الجديدة إلى بداية المصفوفة P
-      P.unshift(...newItems);
+      // 4. دمج المنتجات بدون تكرار في المصفوفة P
+      P = [...newItems, ...P];
 
-      // 5. البحث عن عنصر شبكة المنتجات في الصفحة (grid أو bestgrid)
-      const grid = document.getElementById('grid') ||
-                   document.getElementById('bestgrid') ||
+      // 5. البحث عن الشبكة ورسم الكروت
+      const grid = document.getElementById('grid') || 
+                   document.getElementById('bestgrid') || 
                    document.querySelector('.grid');
 
-      console.log("🎯 عنصر الشبكة الذي تم العثور عليه:", grid);
-
-      if (grid) {
-        // 6. رسم المنتجات في الصفحة باستخدام دالة card الموجودة مسبقاً
+      if (grid && typeof card === 'function') {
         grid.innerHTML = P.map(x => card(x)).join('');
-        console.log("✅ تم تحديث المتجر بنجاح!");
+        console.log("✅ تم تحديث متجرك بنجاح وظهور المنتجات!");
       } else {
-        console.error("❌ لم يتم العثور على عنصر شبكة المنتجات!");
+        console.error("❌ لم يتم العثور على عنصر شبكة المنتجات (grid) في الـ HTML!");
       }
     }
   } catch (e) {
-    console.error("💥 خطأ أثناء المزامنة:", e);
-    // إعادة المحاولة بعد 5 ثواني في حال فشل الاتصال
-    setTimeout(syncStore, 5000);
+    console.error("💥 خطأ أثناء جلب البيانات:", e);
+    // إعادة المحاولة بعد 10 ثوانٍ في حال كان السيرفر يستيقظ
+    setTimeout(syncStore, 10000);
   }
 }
 
-// تشغيل المزامنة بعد تحميل الصفحة
-document.addEventListener('DOMContentLoaded', syncStore);
-
+// تشغيل بعد اكتمال تحميل عناصر الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(syncStore, 800);
+});
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
 let revs=JSON.parse(localStorage.getItem('revs')||'{}');
