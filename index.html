@@ -313,43 +313,46 @@ const P=[
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-const DR={21:[["أمين ب.",5,"دورة ممتازة، شرح واضح جداً والمشاريع مفيدة 👌"],["سارة م.",5,"أحسن دورة برمجة عربية، نصحت بها كل أصدقائي"],["يوسف ك.",4,"محتوى قوي بس يحتاج تحديث في بعض الأجزاء"]],1:[["كريم ز.",5,"جهاز رائع والتوصيل كان سريع لولاية وهران"],["نبيل ع.",4,"ممتاز لكن السعر مرتفع شوية"]],7:[["محمد ص.",5,"أصلي 100% ومريح جداً في المشي"],["ريان ت.",4,"جميل بس المقاس جاء أصغر شوية"]]};
 // === Sync Products from CRM ===
 async function syncStore() {
-    try {
-        const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
-        const data = await res.json();
-        
-        if (Array.isArray(data) && data.length > 0) {
-            const newItems = data.map(item => ({
-                id: item.id || Date.now(),
-                n: item.name,
-                p: Number(item.price) || 0,
-                o: Number(item.oldPrice) || 0,
-                c: "fashion",
-                i: item.image || "",
-                r: 5.0,
-                rv: 45,
-                b: item.oldPrice > item.price ? "sale" : "new",
-                d: item.name
-            }));
+  try {
+    const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
+    const data = await res.json();
 
-            // Adding new products to the start of the list
-            P.unshift(...newItems);
+    if (Array.isArray(data) && data.length > 0) {
+      const newItems = data.map(item => ({
+        id: item.id || Date.now(),
+        n: item.name,
+        p: Number(item.price) || 0,
+        o: Number(item.oldPrice) || 0,
+        c: "fashion",
+        i: item.image || "",
+        r: 5.0,
+        rv: 45,
+        b: item.oldPrice > item.price ? "sale" : "new",
+        d: item.name
+      }));
 
-            // Force Re-render the store grid
-            const grid = document.querySelector('.products-grid') || document.getElementById('products') || document.body;
-            if (grid && typeof card === 'function') {
-                grid.innerHTML = P.map(x => card(x)).join('');
-            }
-        }
-    } catch (e) {
-        // Retry after 5 seconds if CRM is sleeping
-        setTimeout(syncStore, 5000);
+      // إضافة المنتجات الجديدة في بداية القائمة P
+      P.unshift(...newItems);
+
+      // إعادة رسم شبكة المنتجات
+      const grid = document.querySelector('.products-grid') || document.getElementById('products');
+      
+      if (grid && typeof card === 'function') {
+        grid.innerHTML = P.map(x => card(x)).join('');
+      } else {
+        console.error("لم يتم العثور على عنصر شبكة المنتجات أو دالة card غير معرفة!");
+      }
     }
+  } catch (e) {
+    console.error("خطأ في الاتصال بالـ CRM:", e);
+    // إعادة المحاولة بعد 5 ثواني
+    setTimeout(syncStore, 5000);
+  }
 }
 
-// Start sync after 1 second
+// تشغيل المزامنة بعد ثانية واحدة من تحميل الصفحة
 setTimeout(syncStore, 1000);
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
