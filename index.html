@@ -316,11 +316,6 @@ const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المن
 
 
 
-
-// تشغيل بعد اكتمال التحميل
-window.addEventListener('load', () => {
-  setTimeout(syncStore, 1000);
-});
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
 let revs=JSON.parse(localStorage.getItem('revs')||'{}');
