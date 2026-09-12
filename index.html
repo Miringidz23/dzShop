@@ -324,27 +324,29 @@ async function syncStore() {
             const newItems = data.map(item => ({
                 id: item.id || Date.now(),
                 n: item.name,
-                p: item.price,
-                o: item.oldPrice || 0,
+                p: Number(item.price) || 0,
+                o: Number(item.oldPrice) || 0,
                 c: "fashion",
                 i: item.image || "",
                 r: 5.0,
-                rv: 25,
+                rv: 45,
                 b: item.oldPrice > item.price ? "sale" : "new",
                 d: item.name
             }));
 
             P.unshift(...newItems);
 
-            if (typeof render === "function") render();
-            if (typeof renderProducts === "function") renderProducts();
+            const firstCard = document.querySelector('.card');
+            if (firstCard && firstCard.parentElement && typeof card === 'function') {
+                const gridContainer = firstCard.parentElement;
+                gridContainer.innerHTML = P.map(x => card(x)).join('');
+            }
         }
     } catch (e) {
-        console.error("Sync Error:", e);
+        console.log("Waiting for CRM...", e);
     }
 }
 
-// Start Sync
 syncStore();
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
