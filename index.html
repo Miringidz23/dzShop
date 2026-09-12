@@ -334,20 +334,23 @@ async function syncStore() {
                 d: item.name
             }));
 
+            // Adding new products to the start of the list
             P.unshift(...newItems);
 
-            const firstCard = document.querySelector('.card');
-            if (firstCard && firstCard.parentElement && typeof card === 'function') {
-                const gridContainer = firstCard.parentElement;
-                gridContainer.innerHTML = P.map(x => card(x)).join('');
+            // Force Re-render the store grid
+            const grid = document.querySelector('.products-grid') || document.getElementById('products') || document.body;
+            if (grid && typeof card === 'function') {
+                grid.innerHTML = P.map(x => card(x)).join('');
             }
         }
     } catch (e) {
-        console.log("Waiting for CRM...", e);
+        // Retry after 5 seconds if CRM is sleeping
+        setTimeout(syncStore, 5000);
     }
 }
 
-syncStore();
+// Start sync after 1 second
+setTimeout(syncStore, 1000);
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
 let revs=JSON.parse(localStorage.getItem('revs')||'{}');
