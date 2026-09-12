@@ -313,29 +313,29 @@ const P=[
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === Sync Products from CRM (حل مضمون لـ CORS و 403) ===
+// === Sync Products from CRM ===
 async function syncStore() {
-  console.log("🚀 جاري جلب المنتجات من CRM...");
+  console.log("🚀 [1] تم بدء طلب المنتجات...");
 
   try {
-    // 1. رابط API مع بروكسي مجاني ومفتوح 100%
     const targetUrl = "https://crm-app-6t6b.onrender.com/api/get-store-products";
-    const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(targetUrl);
+    // بروكسي مباشر وسريع جداً لتجاوز CORS
+    const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
 
     const res = await fetch(proxyUrl);
 
-    if (!res.ok) throw new Error("خطأ في شبكة البروكسي: " + res.status);
+    if (!res.ok) {
+      throw new Error("السيرفر يستيقظ، كود الحالة: " + res.status);
+    }
 
-    const wrapperData = await res.json();
-    
-    // 2. فك التشفير للبيانات الحقيقية القادمة من Render
-    const rawData = JSON.parse(wrapperData.contents);
-    console.log("📦 البيانات المستلمة بنجاح:", rawData);
+    const rawData = await res.json();
+    console.log("📦 [2] تم استلام البيانات بنجاح:", rawData);
 
     let productsArray = Array.isArray(rawData) ? rawData : (rawData.products || rawData.data || []);
 
+    console.log("📊 [3] عدد المنتجات المستلمة:", productsArray.length);
+
     if (productsArray.length > 0) {
-      // 3. تحويل المنتجات للفرومات الخاص بالمتجر
       const newItems = productsArray.map(item => ({
         id: item.id || item._id || Date.now(),
         n: item.name || item.title || "منتج جديد",
@@ -349,32 +349,32 @@ async function syncStore() {
         d: item.description || item.name || ""
       }));
 
-      // 4. دمج المنتجات بدون تكرار في المصفوفة P
+      // تحديث مصفوفة المنتجات P
       P = [...newItems, ...P];
 
-      // 5. البحث عن الشبكة ورسم الكروت
+      // البحث عن شبكة العرض
       const grid = document.getElementById('grid') || 
                    document.getElementById('bestgrid') || 
                    document.querySelector('.grid');
 
       if (grid && typeof card === 'function') {
         grid.innerHTML = P.map(x => card(x)).join('');
-        console.log("✅ تم تحديث متجرك بنجاح وظهور المنتجات!");
+        console.log("✅ [4] مبروك! ظهرت المنتجات في الواجهة الآن!");
       } else {
-        console.error("❌ لم يتم العثور على عنصر شبكة المنتجات (grid) في الـ HTML!");
+        console.error("❌ لم نجد عنصر الشبكة (grid) في الـ HTML!");
       }
+    } else {
+      console.warn("⚠️ السيرفر لا يحتوي على منتجات حالياً.");
     }
+
   } catch (e) {
-    console.error("💥 خطأ أثناء جلب البيانات:", e);
-    // إعادة المحاولة بعد 10 ثوانٍ في حال كان السيرفر يستيقظ
-    setTimeout(syncStore, 10000);
+    console.error("⏳ جاري الاتصال بالسيرفر، إعادة المحاولة بعد 4 ثوانٍ...", e.message);
+    setTimeout(syncStore, 4000);
   }
 }
 
-// تشغيل بعد اكتمال تحميل عناصر الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(syncStore, 800);
-});
+// تشغيل المزامنة
+setTimeout(syncStore, 500);
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
 let wish=JSON.parse(localStorage.getItem('wish')||'[]');
 let revs=JSON.parse(localStorage.getItem('revs')||'{}');
