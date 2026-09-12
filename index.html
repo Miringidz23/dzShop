@@ -321,40 +321,30 @@ async function syncStore() {
         const data = await res.json();
         
         if (Array.isArray(data) && data.length > 0) {
-            console.log("تم العثور على سلعة جديدة!");
-            
             const newItems = data.map(item => ({
                 id: item.id || Date.now(),
                 n: item.name,
                 p: item.price,
                 o: item.oldPrice || 0,
-                c: item.category || "digital",
+                c: "fashion",
                 i: item.image || "",
-                r: 4.9,
-                rv: 50,
+                r: 5.0,
+                rv: 20,
                 b: item.oldPrice > item.price ? "sale" : "new",
                 d: item.name
             }));
 
-            // إضافة السلعة الجديدة للمصفوفة P
             P.unshift(...newItems);
-            
-            // تنظيف الصفحة وإعادة رسم كل المنتجات
-            const grid = document.querySelector('.products-grid') || document.body;
-            if (grid) {
-                // هذي الدالة لي عندك في المتجر باش تعاود ترسم السلعة
-                if (typeof renderProducts === 'function') {
-                    renderProducts(); 
-                } else {
-                    // إذا ما لقاهاش يدير ريفريش ذكي
-                    location.reload();
-                }
-            }
+
+            if (typeof render === "function") render();
+            if (typeof renderProducts === "function") renderProducts();
         }
     } catch (e) {
-        console.error("الـ CRM مازال ما جاوبش:", e);
+        console.error("Sync Error:", e);
     }
 }
+
+syncStore();
 
 // تشغيل المزامنة
 syncStore();
