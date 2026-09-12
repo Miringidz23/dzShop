@@ -313,52 +313,85 @@ const P=[
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === Sync Products from CRM (نسخة مخصصة للهاتف) ===
+// === Sync Products with On-Screen Debugger ===
 async function syncStore() {
-  const apiUrl = "https://crm-app-6t6b.onrender.com/api/get-store-products";
-  // بروكسي يعيد البيانات مباشرة بدون تعقيد
-  const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(apiUrl);
+  // 1. إنشاء شريط تنبيه أعلى شاشة الهاتف لرؤية ما يحدث مباشرة
+  let statusBox = document.getElementById('api-status-box');
+  if (!statusBox) {
+    statusBox = document.createElement('div');
+    statusBox.id = 'api-status-box';
+    statusBox.style.cssText = "position:fixed;top:0;left:0;width:100%;background:#ff9800;color:#000;text-align:center;padding:10px;font-weight:bold;z-index:99999;font-size:14px;";
+    document.body.appendChild(statusBox);
+  }
+
+  statusBox.innerText = "⏳ جاري الاتصال بـ Render لجلب المنتجات...";
 
   try {
+    const apiUrl = "https://crm-app-6t6b.onrender.com/api/get-store-products";
+    // بروكسي يجلب البيانات المباشرة raw بدون تعقيد
+    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(apiUrl);
+
     const res = await fetch(proxyUrl);
-    if (!res.ok) throw new Error("السيرفر نائم أو يستجيب ببطء");
+    
+    if (!res.ok) {
+      throw new Error("السيرفر نائم أو الاستجابة خاطئة: " + res.status);
+    }
 
     const data = await res.json();
     let list = Array.isArray(data) ? data : (data.products || data.data || []);
 
-    if (list.length > 0) {
-      const formatted = list.map(item => ({
-        id: item.id || item._id || Date.now(),
-        n: item.name || item.title || "منتج جديد",
-        p: Number(item.price) || 0,
-        o: Number(item.oldPrice) || 0,
-        c: item.category || "fashion",
-        i: item.image || item.img || "",
-        r: 5.0,
-        rv: 45,
-        b: (item.oldPrice && item.oldPrice > item.price) ? "sale" : "new",
-        d: item.description || item.name || ""
-      }));
-
-      // إضافة المنتجات الجديدة للمصفوفة P
-      P = [...formatted, ...P];
-
-      // البحث عن مكان المنتجات
-      const grid = document.getElementById('grid') || document.querySelector('.grid');
-
-      if (grid && typeof card === 'function') {
-        grid.innerHTML = P.map(x => card(x)).join('');
-        // تنبيه سيظهر على شاشتك يؤكد أن كل شيء نجح!
-        console.log("تمت المزامنة بنجاح!");
-      }
+    if (list.length === 0) {
+      statusBox.style.background = "#2196F3";
+      statusBox.style.color = "#fff";
+      statusBox.innerText = "⚠️ الاتصال ناجح، ولكن لا توجد منتجات داخل السيرفر (قائمة فارغة).";
+      return;
     }
+
+    // تحويل البيانات
+    const formatted = list.map(item => ({
+      id: item.id || item._id || Date.now(),
+      n: item.name || item.title || "منتج جديد",
+      p: Number(item.price) || 0,
+      o: Number(item.oldPrice) || 0,
+      c: item.category || "fashion",
+      i: item.image || item.img || "",
+      r: 5.0,
+      rv: 45,
+      b: (item.oldPrice && item.oldPrice > item.price) ? "sale" : "new",
+      d: item.description || item.name || ""
+    }));
+
+    // تحديث المصفوفة
+    P = [...formatted, ...P];
+
+    // البحث عن شبكة العرض
+    const grid = document.getElementById('grid') || 
+                 document.getElementById('bestgrid') || 
+                 document.querySelector('.grid');
+
+    if (grid && typeof card === 'function') {
+      grid.innerHTML = P.map(x => card(x)).join('');
+      statusBox.style.background = "#4CAF50";
+      statusBox.style.color = "#fff";
+      statusBox.innerText = `✅ تم بنجاح! تم جلب (${list.length}) منتج ورسمها في المتجر.`;
+      
+      // إخفاء الشريط بعد 5 ثواني عند النجاح
+      setTimeout(() => { statusBox.remove(); }, 5000);
+    } else {
+      statusBox.style.background = "#f44336";
+      statusBox.style.color = "#fff";
+      statusBox.innerText = "❌ وصلت البيانات ولكن لم نجد عنصر الشبكة (#grid) في الـ HTML!";
+    }
+
   } catch (err) {
-    // إعادة المحاولة تلقائياً كل 5 ثواني
+    statusBox.style.background = "#f44336";
+    statusBox.style.color = "#fff";
+    statusBox.innerText = "❌ خطأ في الاتصال: " + err.message + " (جاري إعادة المحاولة...)";
     setTimeout(syncStore, 5000);
   }
 }
 
-// تشغيل عند التحميل الكامل
+// تشغيل بعد اكتمال التحميل
 window.addEventListener('load', () => {
   setTimeout(syncStore, 1000);
 });
