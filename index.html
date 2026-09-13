@@ -398,7 +398,7 @@ function card(x) {
   res += '<div class="acts"><button class="abtn ' + (l ? 'liked' : '') + '" onclick="event.stopPropagation();tw(' + x.id + ')"><i class="fas fa-heart"></i></button></div>';
   res += '</div><div class="cinfo">';
   res += '<span class="ccat">' + CN[x.c] + '</span>';
-  res += '<h3 class="cname" onclick="detail(' + x.id + ')">' + x.n + '</h3>';
+  res += '<h3 class="cname" onclick="openQuickView(\'' + x.id + '\')">' + x.n + '</h3>';
   res += '<div class="rate"><span class="st">' + stars(x.r) + '</span><small>(' + x.rv + ')</small></div>';
   res += '<div class="price"><span class="now">' + fmt(x.p) + '</span>' + oldP + '</div>';
   res += '<div style="display:flex;gap:5px;margin-top:10px">';
@@ -706,6 +706,53 @@ window.addEventListener('load', function() {
   showToast('🛒 تم اختيار المنتج! أكمل معلوماتك للطلب');
   setTimeout(function(){ try { checkout(); } catch(e){} }, 400);
 });
+  // === دوال تشغيل النافذة المنبثقة ===
+function openQuickView(id) {
+  const item = P.find(x => String(x.id) === String(id));
+  if (!item) return;
+
+  const modal = document.getElementById('quickViewModal');
+  if (!modal) return;
+
+  const imgElem = document.getElementById('qvImage');
+  if (imgElem) {
+    if (item.i && !item.i.startsWith('fas')) {
+      imgElem.src = item.i;
+    } else {
+      imgElem.src = 'https://via.placeholder.com/300?text=' + encodeURIComponent(item.n || 'منتج');
+    }
+  }
+
+  document.getElementById('qvTitle').innerText = item.n || item.d || '';
+  document.getElementById('qvPrice').innerText = (item.p || 0).toLocaleString('ar-DZ') + ' د.ج';
+
+  const oldPriceElem = document.getElementById('qvOldPrice');
+  if (oldPriceElem) {
+    if (item.o && Number(item.o) > Number(item.p)) {
+      oldPriceElem.innerText = Number(item.o).toLocaleString('ar-DZ') + ' د.ج';
+      oldPriceElem.style.display = 'inline';
+    } else {
+      oldPriceElem.style.display = 'none';
+    }
+  }
+
+  document.getElementById('qvDesc').innerText = item.d || item.n || '';
+
+  const orderBtn = document.getElementById('qvOrderBtn');
+  if (orderBtn) {
+    orderBtn.onclick = function() {
+      closeQuickView();
+      if (typeof detail === 'function') detail(item.id);
+    };
+  }
+
+  modal.classList.add('active');
+}
+
+function closeQuickView() {
+  const modal = document.getElementById('quickViewModal');
+  if (modal) modal.classList.remove('active');
+}
 </script>
   <!-- === نافذة المعاينة المنبثقة === -->
 <div id="quickViewModal" class="qv-modal">
