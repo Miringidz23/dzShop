@@ -6,6 +6,21 @@
 <title>متجر سوق DZ</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+  .qv-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; align-items: center; justify-content: center; direction: rtl; }
+.qv-modal.active { display: flex; }
+.qv-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+.qv-card { position: relative; z-index: 10; background: #fff; width: 90%; max-width: 380px; border-radius: 18px; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.3); animation: qvPop 0.2s ease-out; }
+@keyframes qvPop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.qv-close { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.1); border: none; border-radius: 50%; width: 32px; height: 34px; font-size: 20px; cursor: pointer; z-index: 20; }
+.qv-image-box { width: 100%; height: 230px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; }
+.qv-image-box img { width: 100%; height: 100%; object-fit: contain; }
+.qv-details { padding: 15px 18px 20px; text-align: right; }
+.qv-details h2 { font-size: 18px; color: #1e293b; margin: 0 0 8px; font-weight: bold; }
+.qv-price-box { margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.qv-price { font-size: 20px; color: #2563eb; font-weight: bold; }
+.qv-old-price { font-size: 14px; color: #94a3b8; text-decoration: line-through; }
+.qv-desc { font-size: 13px; color: #64748b; margin-bottom: 15px; }
+.qv-btn { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; }
 :root{--p:#4f46e5;--pd:#3730a3;--tx:#1f2937;--g:#6b7280;--bg:#f3f4f6;--cd:#fff;--bd:#e5e7eb;--r:12px;--dg:#ef4444;--sc:#10b981;--wr:#f59e0b;--dk:#0ea5e9}
 [data-t="dark"]{--tx:#e5e7eb;--g:#9ca3af;--bg:#0f172a;--cd:#1e293b;--bd:#334155}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
@@ -378,7 +393,7 @@ function card(x) {
   var bg = dg ? 'linear-gradient(135deg,#e0f2fe,#f1f5f9)' : 'url(' + x.i + ')';
   
   var res = '<div class="card">';
-  res += '<div class="cimg" onclick="detail(' + x.id + ')" style="background-image:' + bg + '; background-size:cover; background-position:center">';
+  res += '<div class="cimg" onclick="openQuickView(' + x.id + ')" style="background-image:' + bg + '; background-size:cover; background-position:center">';
   res += '<div class="bdgs">' + badge + '</div>';
   res += '<div class="acts"><button class="abtn ' + (l ? 'liked' : '') + '" onclick="event.stopPropagation();tw(' + x.id + ')"><i class="fas fa-heart"></i></button></div>';
   res += '</div><div class="cinfo">';
@@ -692,5 +707,26 @@ window.addEventListener('load', function() {
   setTimeout(function(){ try { checkout(); } catch(e){} }, 400);
 });
 </script>
+  <!-- === نافذة المعاينة المنبثقة === -->
+<div id="quickViewModal" class="qv-modal">
+  <div class="qv-overlay" onclick="closeQuickView()"></div>
+  <div class="qv-card">
+    <button class="qv-close" onclick="closeQuickView()">&times;</button>
+    <div class="qv-image-box">
+      <img id="qvImage" src="" alt="صورة المنتج">
+    </div>
+    <div class="qv-details">
+      <h2 id="qvTitle">اسم المنتج</h2>
+      <div class="qv-price-box">
+        <span id="qvPrice" class="qv-price">0 د.ج</span>
+        <span id="qvOldPrice" class="qv-old-price"></span>
+      </div>
+      <p id="qvDesc" class="qv-desc">وصف المنتج</p>
+      <button id="qvOrderBtn" class="qv-btn">
+        <i class="fas fa-shopping-cart"></i> طلب الآن
+      </button>
+    </div>
+  </div>
+</div>
 </body>
     </html>
