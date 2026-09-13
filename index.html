@@ -328,15 +328,21 @@ let P = [
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === كود جلب السلعة من CRM (بالصور والتصنيفات الصحيحة) ===
+// === كود جلب السلعة الذكي (مضاد لنوم السيرفر) ===
+let isCrmLoaded = false; // لمنع تكرار السلعة
+
 async function syncStore() {
+  if (isCrmLoaded) return; 
+
   try {
     const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
+    
+    if (!res.ok) throw new Error("السيرفر نائم الآن");
+
     const data = await res.json();
 
     if (data && data.length > 0) {
       const newItems = data.map(item => {
-        // معالجة رابط الصورة (سواء كان رابط كامل أو صورة مرفوعة في CRM)
         let imgUrl = item.image || item.img || "";
         if (imgUrl && !imgUrl.startsWith("http") && !imgUrl.startsWith("fas")) {
           imgUrl = "https://crm-app-6t6b.onrender.com" + imgUrl;
@@ -347,8 +353,8 @@ async function syncStore() {
           n: item.name,
           p: Number(item.price) || 0,
           o: Number(item.oldPrice) || (Number(item.price) + 500),
-          c: item.category || "fashion", // التصنيف القادم من CRM (مثل: fashion, electronics, home...)
-          i: imgUrl || "fas fa-box",     // رابط الصورة أو أيقونة افتراضية
+          c: item.category || "fashion", 
+          i: imgUrl || "fas fa-box",     
           r: 5, 
           rv: 25, 
           b: (item.oldPrice && item.oldPrice > item.price) ? "sale" : "new", 
@@ -356,20 +362,46 @@ async function syncStore() {
         };
       });
 
-      P.unshift(...newItems); // إضافة السلعة الجديدة لأول القائمة
-      
-      // إعادة رسم الصفحة لتحديث الأقسام والصور
-      if (typeof paint === 'function') paint();
-      if (typeof render === 'function') render();
-      
-      console.log("✅ تمت المزامنة بالصور والأقسام الصحيحة!");
+      // 1. حفظ نسخة احتياطية في هاتف الزبون (للمرات القادمة)
+      localStorage.setItem('saved_crm_products', JSON.stringify(newItems));
+
+      // 2. تجنب تكرار عرض نفس المنتج
+      const existingIds = P.map(x => String(x.id));
+      const uniqueItems = newItems.filter(x => !existingIds.includes(String(x.id)));
+
+      if (uniqueItems.length > 0) {
+        P.unshift(...uniqueItems);
+        if (typeof paint === 'function') paint();
+        if (typeof render === 'function') render();
+      }
+
+      isCrmLoaded = true; // السيرفر استيقظ ونجحت العملية
+      console.log("✅ تمت مزامنة المنتجات الحية بنجاح!");
     }
   } catch (e) {
-    console.log("❌ خطأ في المزامنة:", e);
+    console.log("⏳ السيرفر نائم... جاري عرض النسخة المخبأة وإيقاظ السيرفر");
+
+    // 3. عرض النسخة المخبأة في الهاتف فوراً ريثما يستيقظ السيرفر
+    const saved = localStorage.getItem('saved_crm_products');
+    if (saved && !isCrmLoaded) {
+      const parsedSaved = JSON.parse(saved);
+      const existingIds = P.map(x => String(x.id));
+      const uniqueItems = parsedSaved.filter(x => !existingIds.includes(String(x.id)));
+      
+      if(uniqueItems.length > 0) {
+        P.unshift(...uniqueItems);
+        if (typeof paint === 'function') paint();
+        if (typeof render === 'function') render();
+      }
+    }
+
+    // 4. الإلحاح: أعد محاولة الاتصال كل 5 ثواني حتى يستيقظ السيرفر
+    setTimeout(syncStore, 5000);
   }
 }
 
-setTimeout(syncStore, 1000);
+// تشغيل المزامنة عند فتح المتجر
+setTimeout(syncStore, 500);
 
 
 let cart=JSON.parse(localStorage.getItem('cart')||'[]');
