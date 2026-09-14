@@ -440,31 +440,27 @@ function card(x) {
   return res;
 }
 
+// السطر 452 (ستصبح أرقام الأسطر أقل بعد المسح)
 function paint(){
   var dgGrid = document.getElementById('grid');
   var flashGrid = document.getElementById('flashGrid');
   var bestGrid = document.getElementById('bestGrid');
-  if(dgGrid) dgGrid.innerHTML=P.filter(function(x){return x.c==='digital'}).map(card).join('');
+  if(dgGrid) dgGrid.innerHTML = P.filter(function(x){return x.c === 'digital'}).map(card).join('');
   render();
 }
 
-
-
-function filt(c,el){
-  cf=c;sq='';
-  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on')});
-  if(el)el.classList.add('on');
-  render();
-}
 function render(){
-  let l=P.filter(x=>(cf==='all'||x.c===cf)&&(!sq||x.n.includes(sq)||x.d.includes(sq)));
-  grid.innerHTML=l.length?l.map(card).join(''):'<div class="empty">لم يتم العثور على نتائج</div>';
+  var l = P.filter(function(x){
+    return (cf === 'all' || x.c === cf) && (!sq || (x.n && x.n.includes(sq)) || (x.d && x.d.includes(sq)));
+  });
+  var gridEl = document.getElementById('grid');
+  if(gridEl) gridEl.innerHTML = l.length ? l.map(card).join('') : '<div class="empty">لا توجد نتائج</div>';
 }
 
 function filt(c,el){
-  cf=c;sq='';sInput.value='';
-  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
-  if(el)el.classList.add('on');
+  cf=c; sq=''; sInput.value=''; // هذا التعديل الأفضل لإعادة ضبط البحث
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on')});
+  if(el) el.classList.add('on');
   render();
 }
 
