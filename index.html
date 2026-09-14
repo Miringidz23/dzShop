@@ -409,7 +409,7 @@ function paint(){
   var dgGrid = document.getElementById('grid');
   var flashGrid = document.getElementById('flashGrid');
   var bestGrid = document.getElementById('bestGrid');
-  if(dgGrid) dgGrid.innerHTML = P.filter(function(x){return x.c === 'digital'}).map(card).join('');
+  if(dgGrid) dgGrid.innerHTML = P.map(card).join('');
   render();
 }
 
