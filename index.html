@@ -448,13 +448,7 @@ function paint(){
   render();
 }
 
-function render(){
-  var l=P.filter(function(x){
-    return (cf==='all'||x.c===cf)&&(!sq||x.n.includes(sq)||x.d.includes(sq));
-  });
-  var gridEl = document.getElementById('grid');
-  if(gridEl) gridEl.innerHTML=l.length?l.map(card).join(''):'<div class="empty">لا توجد نتائج</div>';
-}
+
 
 function filt(c,el){
   cf=c;sq='';
