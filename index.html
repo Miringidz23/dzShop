@@ -328,52 +328,39 @@ let P = [
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === كود جلب السلعة المطور (MongoDB + Anti-Sleep) ===
 async function syncStore() {
   try {
-    console.log("🚀 جاري جلب المنتجات من CRM...");
     const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
-    
-    if (!res.ok) throw new Error("السيرفر نائم");
-
     const data = await res.json();
-    if (data && data.length > 0) {
-      const newItems = data.map(item => {
-        // معالجة الصور
-        let imgUrl = item.image || item.img || "";
-        if (imgUrl && !imgUrl.startsWith("http") && !imgUrl.startsWith("fas")) {
-          imgUrl = "https://crm-app-6t6b.onrender.com" + imgUrl;
-        }
 
-        return {
-          id: String(item.id || Date.now()),
-          n: item.name,
-          p: Number(item.price) || 0,
-          o: Number(item.oldPrice) || (Number(item.price) + 500),
-          c: item.category || "fashion", 
-          i: imgUrl || "fas fa-box",
-          r: 5, rv: 25, b: "new", d: item.name
-        };
+    if (data && data.length > 0) {
+      const newItems = data.map(item => ({
+        id: item.id || Date.now(),
+        n: item.name,
+        p: Number(item.price) || 0,
+        o: Number(item.oldPrice) || (Number(item.price) + 500),
+        c: item.category || "fashion", // التصنيف القادم من السيرفر
+        i: item.image || "fas fa-box",
+        r: 5, rv: 25, b: "new", d: item.name
+      }));
+
+      // إضافة المنتجات الجديدة لـ P ومنع التكرار
+      const existingIds = P.map(x => String(x.id));
+      newItems.forEach(item => {
+        if (!existingIds.includes(String(item.id))) {
+          P.unshift(item);
+        }
       });
 
-      // منع التكرار وإضافة السلعة للمصفوفة P
-      const existingIds = P.map(x => String(x.id));
-      const uniqueItems = newItems.filter(x => !existingIds.includes(String(x.id)));
-
-      if (uniqueItems.length > 0) {
-        P.unshift(...uniqueItems);
-        // استدعاء دوال الرسم الموجودة في متجرك
-        if (typeof paint === 'function') paint();
-        if (typeof render === 'function') render();
-      }
-      console.log("✅ تم تحديث المتجر بـ " + uniqueItems.length + " منتج جديد");
+      // تشغيل الرسم لجميع التصنيفات
+      if (typeof render === 'function') render(); 
+      console.log("✅ المنتجات المزامنة جاهزة للعرض!");
     }
   } catch (e) {
-    console.log("⏳ السيرفر نائم، سأحاول مجدداً بعد 5 ثواني...");
-    setTimeout(syncStore, 5000); // إعادة المحاولة حتى يستيقظ Render
+    console.log("⏳ انتظار استيقاظ السيرفر...");
+    setTimeout(syncStore, 5000);
   }
-}
-
+  }
 // تشغيل المزامنة فور فتح المتجر
 setTimeout(syncStore, 1000);
 
