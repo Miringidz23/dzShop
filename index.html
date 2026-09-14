@@ -328,77 +328,54 @@ let P = [
 {id:20,n:"رواية عربية مميزة",c:"books",p:1900,o:2900,r:4.6,rv:150,b:"sale",i:"fas fa-book-open",d:"من أفضل الروايات العربية المعاصرة بغلاف فاخر.",sp:[["الصفحات","320"],["الغلاف","فاخر"]],best:0,fl:0}
 ];
 const CN={electronics:"إلكترونيات",fashion:"أزياء",home:"المنزل",sports:"رياضة",beauty:"جمال",books:"كتب",digital:"رقمية"};
-// === كود جلب السلعة الذكي (مضاد لنوم السيرفر) ===
-let isCrmLoaded = false; // لمنع تكرار السلعة
-
+// === كود جلب السلعة المطور (MongoDB + Anti-Sleep) ===
 async function syncStore() {
-  if (isCrmLoaded) return; 
-
   try {
+    console.log("🚀 جاري جلب المنتجات من CRM...");
     const res = await fetch("https://crm-app-6t6b.onrender.com/api/get-store-products");
     
-    if (!res.ok) throw new Error("السيرفر نائم الآن");
+    if (!res.ok) throw new Error("السيرفر نائم");
 
     const data = await res.json();
-
     if (data && data.length > 0) {
       const newItems = data.map(item => {
+        // معالجة الصور
         let imgUrl = item.image || item.img || "";
         if (imgUrl && !imgUrl.startsWith("http") && !imgUrl.startsWith("fas")) {
           imgUrl = "https://crm-app-6t6b.onrender.com" + imgUrl;
         }
 
         return {
-          id: item.id || Date.now(),
+          id: String(item.id || Date.now()),
           n: item.name,
           p: Number(item.price) || 0,
           o: Number(item.oldPrice) || (Number(item.price) + 500),
           c: item.category || "fashion", 
-          i: imgUrl || "fas fa-box",     
-          r: 5, 
-          rv: 25, 
-          b: (item.oldPrice && item.oldPrice > item.price) ? "sale" : "new", 
-          d: item.name
+          i: imgUrl || "fas fa-box",
+          r: 5, rv: 25, b: "new", d: item.name
         };
       });
 
-      // 1. حفظ نسخة احتياطية في هاتف الزبون (للمرات القادمة)
-      localStorage.setItem('saved_crm_products', JSON.stringify(newItems));
-
-      // 2. تجنب تكرار عرض نفس المنتج
+      // منع التكرار وإضافة السلعة للمصفوفة P
       const existingIds = P.map(x => String(x.id));
       const uniqueItems = newItems.filter(x => !existingIds.includes(String(x.id)));
 
       if (uniqueItems.length > 0) {
         P.unshift(...uniqueItems);
+        // استدعاء دوال الرسم الموجودة في متجرك
         if (typeof paint === 'function') paint();
         if (typeof render === 'function') render();
       }
-
-      isCrmLoaded = true; // السيرفر استيقظ ونجحت العملية
-      console.log("✅ تمت مزامنة المنتجات الحية بنجاح!");
+      console.log("✅ تم تحديث المتجر بـ " + uniqueItems.length + " منتج جديد");
     }
   } catch (e) {
-    console.log("⏳ السيرفر نائم... جاري عرض النسخة المخبأة وإيقاظ السيرفر");
-
-    // 3. عرض النسخة المخبأة في الهاتف فوراً ريثما يستيقظ السيرفر
-    const saved = localStorage.getItem('saved_crm_products');
-    if (saved && !isCrmLoaded) {
-      const parsedSaved = JSON.parse(saved);
-      const existingIds = P.map(x => String(x.id));
-      const uniqueItems = parsedSaved.filter(x => !existingIds.includes(String(x.id)));
-      
-      if(uniqueItems.length > 0) {
-        P.unshift(...uniqueItems);
-        if (typeof paint === 'function') paint();
-        if (typeof render === 'function') render();
-      }
-    }
-
-    // 4. الإلحاح: أعد محاولة الاتصال كل 5 ثواني حتى يستيقظ السيرفر
-    setTimeout(syncStore, 5000);
+    console.log("⏳ السيرفر نائم، سأحاول مجدداً بعد 5 ثواني...");
+    setTimeout(syncStore, 5000); // إعادة المحاولة حتى يستيقظ Render
   }
 }
+
+// تشغيل المزامنة فور فتح المتجر
+setTimeout(syncStore, 1000);
 
 // تشغيل المزامنة عند فتح المتجر
 setTimeout(syncStore, 500);
